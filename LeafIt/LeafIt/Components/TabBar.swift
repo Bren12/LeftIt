@@ -18,7 +18,7 @@ struct TabBar: View {
                     Label("Home", systemImage: "house")
                 }
             
-            HomeView()
+            ExploreView()
                 .tabItem {
                     Label("Explore", systemImage: "magnifyingglass")
                 }
