@@ -11,7 +11,7 @@ import SwiftUI
 struct LeafItApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            TabBar()
         }
     }
 }
