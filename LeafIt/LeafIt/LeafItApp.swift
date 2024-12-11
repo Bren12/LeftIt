@@ -6,12 +6,24 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct LeafItApp: App {
+    
+    init() {
+        FirebaseApp.configure()
+    } // -> init
+    
     var body: some Scene {
+        
         WindowGroup {
-            TabBar()
-        }
-    }
-}
+            
+//            TabBar()
+            RootView()
+            
+        } // -> WindowGroup
+        
+    } // -> body
+    
+} // -> LeafItApp
