@@ -22,11 +22,11 @@ struct AuthDataResultModel {
     }
 }
 
-//enum AuthProviderOption: String {
-//    case email = "password"
-//    case google = "google.com"
-//    case apple = "apple.com"
-//}
+enum AuthProviderOption: String {
+    case email = "password"
+    case google = "google.com"
+    case apple = "apple.com"
+}
 
 final class AuthenticationManager {
     
@@ -44,6 +44,25 @@ final class AuthenticationManager {
         return AuthDataResultModel(user: user)
         
     } // -> getAuthenticatedUser
+    
+    
+    
+    func getProviders() throws -> [AuthProviderOption] {
+        guard let providerData = Auth.auth().currentUser?.providerData else {
+            throw URLError(.badServerResponse)
+        }
+        
+        var providers: [AuthProviderOption] = []
+        for provider in providerData {
+            if let option = AuthProviderOption(rawValue: provider.providerID) {
+                providers.append(option)
+            } else {
+                assertionFailure("Provider option not found: \(provider.providerID)")
+            }
+        }
+        print(providers)
+        return providers
+    }
     
     
     
@@ -103,16 +122,21 @@ extension AuthenticationManager {
     func signInAnonymous() async throws -> AuthDataResultModel {
         let authDataResult = try await Auth.auth().signInAnonymously()
         return AuthDataResultModel(user: authDataResult.user)
-    }
-    
-//    private func linkCredential(credential: AuthCredential) async throws -> AuthDataResultModel {
-//        guard let user = Auth.auth().currentUser else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        let authDataResult = try await user.link(with: credential)
-//        return AuthDataResultModel(user: authDataResult.user)
-//    }
+    } // -> signInAnonymous
     
     
-}
+    func linkEmail(email: String, password: String) async throws -> AuthDataResultModel {
+        let credential = EmailAuthProvider.credential(withEmail: email, password: password)
+        return try await linkCredential(credential: credential)
+    } // -> linkEmail
+    
+    private func linkCredential(credential: AuthCredential) async throws -> AuthDataResultModel {
+        guard let user = Auth.auth().currentUser else {
+            throw URLError(.badURL)
+        } // -> guard
+        
+        let authDataResult = try await user.link(with: credential)
+        return AuthDataResultModel(user: authDataResult.user)
+    } // -> linkCredential
+    
+} // -> extension
