@@ -12,13 +12,13 @@ struct AuthDataResultModel {
     let uid: String
     let email: String?
     let photoUrl: String?
-//    let isAnonymous: Bool
+    let isAnonymous: Bool
     
     init(user: User) {
         self.uid = user.uid
         self.email = user.email
         self.photoUrl = user.photoURL?.absoluteString
-//        self.isAnonymous = user.isAnonymous
+        self.isAnonymous = user.isAnonymous
     }
 }
 
@@ -89,51 +89,22 @@ final class AuthenticationManager {
     
     
     
-//    func getProviders() throws -> [AuthProviderOption] {
-//        guard let providerData = Auth.auth().currentUser?.providerData else {
-//            throw URLError(.badServerResponse)
-//        }
-//        
-//        var providers: [AuthProviderOption] = []
-//        for provider in providerData {
-//            if let option = AuthProviderOption(rawValue: provider.providerID) {
-//                providers.append(option)
-//            } else {
-//                assertionFailure("Provider option not found: \(provider.providerID)")
-//            }
-//        }
-//        print(providers)
-//        return providers
-//    }
-       
-    
-    
     func signOut() throws {
         try Auth.auth().signOut()
     } // -> signOut
-    
-    
-    
-//    func delete() async throws {
-//        guard let user = Auth.auth().currentUser else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        try await user.delete()
-//    }
     
 } // -> AuthenticationManager
 
 // MARK: SIGN IN ANONYMOUS
 
-//extension AuthenticationManager {
-//    
-//    @discardableResult
-//    func signInAnonymous() async throws -> AuthDataResultModel {
-//        let authDataResult = try await Auth.auth().signInAnonymously()
-//        return AuthDataResultModel(user: authDataResult.user)
-//    }
-//    
+extension AuthenticationManager {
+    
+    @discardableResult
+    func signInAnonymous() async throws -> AuthDataResultModel {
+        let authDataResult = try await Auth.auth().signInAnonymously()
+        return AuthDataResultModel(user: authDataResult.user)
+    }
+    
 //    private func linkCredential(credential: AuthCredential) async throws -> AuthDataResultModel {
 //        guard let user = Auth.auth().currentUser else {
 //            throw URLError(.badURL)
@@ -142,6 +113,6 @@ final class AuthenticationManager {
 //        let authDataResult = try await user.link(with: credential)
 //        return AuthDataResultModel(user: authDataResult.user)
 //    }
-//    
-//    
-//}
+    
+    
+}

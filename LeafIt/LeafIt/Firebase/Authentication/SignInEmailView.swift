@@ -39,6 +39,10 @@ final class SignInEmailViewModel: ObservableObject {
         
     } // signIn
     
+    func signInAnonymous() async throws {
+        try await AuthenticationManager.shared.signInUser(email: email, password: password)
+    } // signInAnonymous
+    
 } // SignInEmailViewModel
 
 struct SignInEmailView: View {
