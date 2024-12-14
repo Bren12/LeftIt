@@ -19,7 +19,7 @@ final class ProfileViewModel: ObservableObject {
     } // -> loadCurrentUser
     
     func togglePremiumStatus() {
-        guard var user else { return }
+        guard let user else { return }
         let currValue = user.isPremium ?? false
         Task {
             try await UserManager.shared.updateUserPremiumStatus(userID: user.userId, isPremium: !currValue)
@@ -51,7 +51,35 @@ struct ProfileView: View {
                     viewModel.togglePremiumStatus()
                 } label: {
                     Text("User is premium: \((user.isPremium ?? false).description.capitalized)")
-                }
+                } // Button
+                
+                VStack {
+                    
+                    HStack {
+                        
+                        Button("Sports") {
+                            //
+                        } // Button
+                        .font(.headline)
+                        .buttonStyle(.borderedProminent)
+                        
+                        Button("Movies") {
+                            //
+                        } // Button
+                        .font(.headline)
+                        .buttonStyle(.borderedProminent)
+                        
+                        Button("Books") {
+                            //
+                        } // Button
+                        .font(.headline)
+                        .buttonStyle(.borderedProminent)
+                        
+                    } // -> HStack
+                    
+                    Text("User preferences \(false)")
+                    
+                } // -> VStack
                 
             } // -> ProfileViewModel
             
@@ -78,5 +106,5 @@ struct ProfileView: View {
 } // -> ProfileViewModel
 
 #Preview {
-    ProfileView(showSignInView: .constant(false))
+    RootView2()
 }

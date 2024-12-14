@@ -24,24 +24,24 @@ final class UserManager {
     
     
     
-    private let encoder: Firestore.Encoder = {
-        let encoder = Firestore.Encoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        return encoder
-    }() // -> encoder
-    
-    
-    
-    private let decoder: Firestore.Decoder = {
-        let decoder = Firestore.Decoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return decoder
-    }() // -> decoder
+//    private let encoder: Firestore.Encoder = {
+//        let encoder = Firestore.Encoder()
+//        encoder.keyEncodingStrategy = .convertToSnakeCase
+//        return encoder
+//    }() // -> encoder
+//    
+//    
+//    
+//    private let decoder: Firestore.Decoder = {
+//        let decoder = Firestore.Decoder()
+//        decoder.keyDecodingStrategy = .convertFromSnakeCase
+//        return decoder
+//    }() // -> decoder
     
     
     
     func createNewUser(user: DBUser) async throws {
-        try userDocument(userID: user.userId).setData(from: user, merge: false, encoder: encoder)
+        try userDocument(userID: user.userId).setData(from: user, merge: false)
     } // -> createNewUser
     
     
@@ -68,7 +68,7 @@ final class UserManager {
     
     
     func getUser(userID: String) async throws -> DBUser {
-        try await userDocument(userID: userID).getDocument(as: DBUser.self, decoder: decoder)
+        try await userDocument(userID: userID).getDocument(as: DBUser.self)
     } // -> getUser
     
     
@@ -99,7 +99,7 @@ final class UserManager {
     
     func updateUserPremiumStatus(userID: String, isPremium: Bool) async throws {
         let data: [String: Any] = [
-            "is_premium": isPremium
+            DBUser.CodingKeys.isPremium.rawValue: isPremium,
         ] // -> data
         try await userDocument(userID: userID).updateData(data)
     } // -> updateUserPremiumStatus
