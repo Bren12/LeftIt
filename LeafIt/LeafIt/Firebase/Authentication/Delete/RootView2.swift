@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct RootView: View {
+struct RootView2: View {
     
-    @State private var showSignInView: Bool = false
+    @State private var showSplashView: Bool = false
     
     var body: some View {
         
@@ -17,7 +17,7 @@ struct RootView: View {
             
             NavigationStack {
                 
-                SettingsView(showSignInView: $showSignInView)
+                ProfileView(showSignInView: $showSplashView)
                 
             } // NavigationStack
             
@@ -25,14 +25,14 @@ struct RootView: View {
         .onAppear {
             
             let authUser = try? AuthenticationManager.shared.getAuthenticatedUser()
-            self.showSignInView = authUser == nil
+            self.showSplashView = authUser == nil
             
         } // onAppear
-        .fullScreenCover(isPresented: $showSignInView) {
+        .fullScreenCover(isPresented: $showSplashView) {
             
             NavigationStack {
                 
-                SplashView(showSignInView: $showSignInView)
+                SplashFakeView(showSignInView: $showSplashView)
                 
             } // NavigationStack
             
@@ -43,5 +43,5 @@ struct RootView: View {
 } // RootView
 
 #Preview {
-    RootView()
+    RootView2()
 } // Preview

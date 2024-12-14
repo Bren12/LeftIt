@@ -129,6 +129,7 @@ struct HomeView: View {
                         } // -> HStack
                         
                     } // -> ScrollView
+                    .scrollIndicators(.hidden)
                     
                     Spacer()
                         .frame(height: 30)
@@ -185,6 +186,7 @@ struct HomeView: View {
                         } // -> HStack
                         
                     } // -> ScrollView
+                    .scrollIndicators(.hidden)
                     
                     Spacer()
                         .frame(height: 100)
@@ -192,6 +194,7 @@ struct HomeView: View {
                 } // -> VStack
                 
             } // -> ScrollView
+            .scrollIndicators(.hidden)
             
         } // -> ZStack
         .ignoresSafeArea()
