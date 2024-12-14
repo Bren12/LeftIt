@@ -8,25 +8,11 @@
 import Foundation
 import FirebaseAuth
 
-struct AuthDataResultModel {
-    let uid: String
-    let email: String?
-    let photoUrl: String?
-    let isAnonymous: Bool
-    
-    init(user: User) {
-        self.uid = user.uid
-        self.email = user.email
-        self.photoUrl = user.photoURL?.absoluteString
-        self.isAnonymous = user.isAnonymous
-    }
-}
-
 enum AuthProviderOption: String {
     case email = "password"
     case google = "google.com"
     case apple = "apple.com"
-}
+} // -> AuthProviderOption
 
 final class AuthenticationManager {
     
@@ -35,14 +21,12 @@ final class AuthenticationManager {
     private init() {}
     
     
+    
     func getAuthenticatedUser() throws -> AuthDataResultModel {
-        
         guard let user = Auth.auth().currentUser else {
             throw URLError(.badServerResponse)
         } // -> guard
-        
         return AuthDataResultModel(user: user)
-        
     } // -> getAuthenticatedUser
     
     
@@ -50,28 +34,29 @@ final class AuthenticationManager {
     func getProviders() throws -> [AuthProviderOption] {
         guard let providerData = Auth.auth().currentUser?.providerData else {
             throw URLError(.badServerResponse)
-        }
+        } // -> guard
         
         var providers: [AuthProviderOption] = []
+        
         for provider in providerData {
             if let option = AuthProviderOption(rawValue: provider.providerID) {
                 providers.append(option)
             } else {
                 assertionFailure("Provider option not found: \(provider.providerID)")
-            }
-        }
+            } // -> if-else
+        } // -> for
+        
         print(providers)
+        
         return providers
-    }
+    } // -> getProviders
     
     
     
     @discardableResult
     func createUser(email: String, password: String) async throws -> AuthDataResultModel {
-        
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
         return AuthDataResultModel(user: authDataResult.user)
-        
     } // -> createUser
     
     
@@ -93,7 +78,7 @@ final class AuthenticationManager {
     func updatePassword(password: String) async throws {
         guard let user = Auth.auth().currentUser else {
             throw URLError(.badServerResponse)
-        }
+        } // -> guard
         try await user.updatePassword(to: password)
     } // -> updatePassword
     
@@ -102,7 +87,7 @@ final class AuthenticationManager {
     func updateEmail(email: String) async throws {
         guard let user = Auth.auth().currentUser else {
             throw URLError(.badServerResponse)
-        }
+        } // -> guard
         try await user.updateEmail(to: email)
     } // -> updateEmail
     
@@ -110,6 +95,15 @@ final class AuthenticationManager {
     
     func signOut() throws {
         try Auth.auth().signOut()
+    } // -> signOut
+    
+    
+    
+    func deleteUser() async throws {
+        guard let user = Auth.auth().currentUser else {
+            throw URLError(.badServerResponse)
+        } // -> guard
+        try await user.delete()
     } // -> signOut
     
 } // -> AuthenticationManager
@@ -124,7 +118,6 @@ extension AuthenticationManager {
         return AuthDataResultModel(user: authDataResult.user)
     } // -> signInAnonymous
     
-    
     func linkEmail(email: String, password: String) async throws -> AuthDataResultModel {
         let credential = EmailAuthProvider.credential(withEmail: email, password: password)
         return try await linkCredential(credential: credential)
@@ -134,7 +127,6 @@ extension AuthenticationManager {
         guard let user = Auth.auth().currentUser else {
             throw URLError(.badURL)
         } // -> guard
-        
         let authDataResult = try await user.link(with: credential)
         return AuthDataResultModel(user: authDataResult.user)
     } // -> linkCredential

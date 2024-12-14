@@ -1,5 +1,5 @@
 //
-//  SplashView.swift
+//  SplashFakeView.swift
 //  LeafIt
 //
 //  Created by Brenda Elena Saucedo Gonzalez on 10/12/24.
@@ -7,19 +7,7 @@
 
 import SwiftUI
 
-@MainActor
-final class AuthenticationViewModel: ObservableObject {
-    
-    func signInAnonymous() async throws {
-        try await AuthenticationManager.shared.signInAnonymous()
-//        let authDataResult = try await AuthenticationManager.shared.signInAnonymous()
-//        let user = DBUser(auth: authDataResult)
-//        try await UserManager.shared.createNewUser(user: user)
-    } // -> signInAnonymous
-
-} // -> AuthenticationViewModel
-
-struct SplashView: View {
+struct SplashFakeView: View {
     
     @StateObject private var viewModel = AuthenticationViewModel()
     
@@ -82,6 +70,6 @@ struct SplashView: View {
 
 #Preview {
     NavigationStack {
-        SplashView(showSignInView: .constant(false))
+        SplashFakeView(showSignInView: .constant(false))
     } // NavigationStack
 } // -> Preview
