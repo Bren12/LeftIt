@@ -24,19 +24,19 @@ final class UserManager {
     
     
     
-//    private let encoder: Firestore.Encoder = {
-//        let encoder = Firestore.Encoder()
+    private let encoder: Firestore.Encoder = {
+        let encoder = Firestore.Encoder()
 //        encoder.keyEncodingStrategy = .convertToSnakeCase
-//        return encoder
-//    }() // -> encoder
-//    
-//    
-//    
-//    private let decoder: Firestore.Decoder = {
-//        let decoder = Firestore.Decoder()
+        return encoder
+    }() // -> encoder
+
+
+
+    private let decoder: Firestore.Decoder = {
+        let decoder = Firestore.Decoder()
 //        decoder.keyDecodingStrategy = .convertFromSnakeCase
-//        return decoder
-//    }() // -> decoder
+        return decoder
+    }() // -> decoder
     
     
     
@@ -46,62 +46,56 @@ final class UserManager {
     
     
     
-//    func createNewUser(auth: AuthDataResultModel) async throws {
-//        
-//        var userData: [String: Any] = [
-//            "user_id": auth.uid,
-//            "is_anonymous": auth.isAnonymous,
-//            "date_created": Timestamp()
-//        ] // -> userData
-//        
-//        if let email = auth.email {
-//            userData["email"] = email
-//        } // -> if
-//        
-//        if let photoUrl = auth.photoUrl {
-//            userData["photo_url"] = photoUrl
-//        } // -> if
-//        
-//        try await userDocument(userID: auth.uid).setData(userData, merge: false)
-//    } // -> createNewUser
-    
-    
-    
     func getUser(userID: String) async throws -> DBUser {
         try await userDocument(userID: userID).getDocument(as: DBUser.self)
     } // -> getUser
     
     
-    
-//    func getUser(userID: String) async throws -> DBUser {
-//        
-//        let snapshot = try await userDocument(userID: userID).getDocument()
-//        
-//        guard let data = snapshot.data(), let user_id = data["user_id"] as? String else {
-//            throw URLError(.badServerResponse)
-//        } // -> guard
-//        
-//        let isAnonymous = data["is_anonymous"] as? Bool
-//        let email = data["email"] as? String
-//        let photoUrl = data["photo_url"] as? String
-//        let dateCreated = data["date_created"] as? Date
-//        
-//        return DBUser(userID: user_id, isAnonymous: isAnonymous, email: email, photoUrl: photoUrl, dateCreated: dateCreated)
-//    } // -> getUser
-    
-    
-    
-//    func updateUserPremiumStatus(user: DBUser) async throws {
-//        try userDocument(userID: user.userId).setData(from: user, merge: true, encoder: encoder)
-//    } // -> updateUserPremiumStatus
-    
-    
-    
+        
     func updateUserPremiumStatus(userID: String, isPremium: Bool) async throws {
         let data: [String: Any] = [
             DBUser.CodingKeys.isPremium.rawValue: isPremium,
         ] // -> data
         try await userDocument(userID: userID).updateData(data)
     } // -> updateUserPremiumStatus
+    
+    
+    
+    func addUserPreference(userID: String, preference: String) async throws {
+        let data: [String: Any] = [
+            DBUser.CodingKeys.preference.rawValue: FieldValue.arrayUnion([preference]),
+        ] // -> data
+        try await userDocument(userID: userID).updateData(data)
+    } // -> addUserPreference
+    
+    
+    
+    func removeUserPreference(userID: String, preference: String) async throws {
+        let data: [String: Any] = [
+            DBUser.CodingKeys.preference.rawValue: FieldValue.arrayRemove([preference]),
+        ] // -> data
+        try await userDocument(userID: userID).updateData(data)
+    } // -> addUserPreference
+    
+    
+    
+    func addFavoriteMovie(userID: String, movie: Movie) async throws {
+        guard let data = try? encoder.encode(movie) else {
+            throw URLError(.badURL)
+        }
+        let dict: [String: Any] = [
+            DBUser.CodingKeys.favoriteMovie.rawValue: data,
+        ] // -> data
+        try await userDocument(userID: userID).updateData(dict)
+    } // -> addUserPreference
+    
+    
+    
+    func removeFavoriteMovie(userID: String) async throws {
+        let data: [String: Any?] = [
+            DBUser.CodingKeys.favoriteMovie.rawValue: nil
+        ] // -> data
+        try await userDocument(userID: userID).updateData(data as [AnyHashable: Any])
+    } // -> addUserPreference
     
 } // -> UserManager
