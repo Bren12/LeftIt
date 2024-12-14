@@ -7,6 +7,12 @@
 
 import Foundation
 
+struct Movie: Codable {
+    let id: String
+    let title: String
+    let isPopular: Bool
+} // Movie
+
 struct DBUser: Codable {
     let userId: String
     let isAnonymous: Bool?
@@ -14,6 +20,8 @@ struct DBUser: Codable {
     let photoUrl: String?
     let dateCreated: Date?
     let isPremium: Bool?
+    let preference: [String]?
+    let favoriteMovie: Movie?
     
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
@@ -22,6 +30,8 @@ struct DBUser: Codable {
         case photoUrl = "photo_url"
         case dateCreated = "date_created"
         case isPremium = "is_premium"
+        case preference = "preference"
+        case favoriteMovie = "favorete_movie"
     } // -> enum
     
     init(auth: AuthDataResultModel) {
@@ -31,6 +41,8 @@ struct DBUser: Codable {
         self.photoUrl = auth.photoUrl
         self.dateCreated = Date()
         self.isPremium = false
+        self.preference = nil
+        self.favoriteMovie = nil
     } // -> init
     
     init(
@@ -39,7 +51,9 @@ struct DBUser: Codable {
         email: String? = nil,
         photoUrl: String? = nil,
         dateCreated: Date? = nil,
-        isPremium: Bool? = nil
+        isPremium: Bool? = nil,
+        preference: [String]? = nil,
+        favoriteMovie: Movie? = nil
     ) {
         self.userId = userId
         self.isAnonymous = isAnonymous
@@ -47,6 +61,8 @@ struct DBUser: Codable {
         self.photoUrl = photoUrl
         self.dateCreated = dateCreated
         self.isPremium = isPremium
+        self.preference = preference
+        self.favoriteMovie = favoriteMovie
     } // -> init
     
     init(from decoder: Decoder) throws {
@@ -57,6 +73,8 @@ struct DBUser: Codable {
         self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
         self.dateCreated = try container.decodeIfPresent(Date.self, forKey: .dateCreated)
         self.isPremium = try container.decodeIfPresent(Bool.self, forKey: .isPremium)
+        self.preference = try container.decodeIfPresent([String].self, forKey: .preference)
+        self.favoriteMovie = try container.decodeIfPresent(Movie.self, forKey: .favoriteMovie)
     }
     
     
@@ -69,13 +87,10 @@ struct DBUser: Codable {
         try container.encodeIfPresent(self.photoUrl, forKey: .photoUrl)
         try container.encodeIfPresent(self.dateCreated, forKey: .dateCreated)
         try container.encodeIfPresent(self.isPremium, forKey: .isPremium)
+        try container.encodeIfPresent(self.preference, forKey: .preference)
+        try container.encodeIfPresent(self.favoriteMovie, forKey: .favoriteMovie)
     }
     
     
-    
-//    mutating func togglePremiumStatus() {
-//        let currValue = isPremium ?? false
-//        isPremium = !currValue
-//    } // -> togglePremiumStatus
     
 } // -> DBUser
