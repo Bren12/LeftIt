@@ -42,6 +42,7 @@ final class UserManager {
     
     func createNewUser(user: DBUser) async throws {
         try userDocument(userID: user.userId).setData(from: user, merge: false)
+        try await ListManager.shared.createDefaultList(user: user.userId)
     } // -> createNewUser
     
     

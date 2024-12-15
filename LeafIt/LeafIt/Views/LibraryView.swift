@@ -7,14 +7,46 @@
 
 import SwiftUI
 
-struct LibraryView: View {
+@MainActor
+final class LibraryModel: ObservableObject {
     
-    @StateObject var storeCarImg = StoreCarImg()
+    @Published private(set) var user: DBUser? = nil
+    @Published private(set) var lists: [DBList]? = nil
+    
+    func loadCurrentUser() async throws {
+        let authDataResult = try AuthenticationManager.shared.getAuthenticatedUser()
+        self.user = try await UserManager.shared.getUser(userID: authDataResult.uid)
+    } // -> loadCurrentUser
+    
+    func loadCurrentLists() async throws {
+        guard let user else { return }
+        self.lists = try await ListManager.shared.getLists(forUserId: user.userId)
+    } // -> loadCurrentUser
+    
+    func createList(name: String) {
+        guard let user else { return }
+        Task {
+            try await ListManager.shared.createNewList(user: user.userId, name: name)
+            self.lists = try await ListManager.shared.getLists(forUserId: user.userId)
+        }
+    } // -> createList
+    
+} // -> LibraryModel
+
+struct LibraryView: View {
     
     @State private var search: String = ""
     @State private var startSearch: Bool = false
+    @State private var inputText: String = ""
+    
+    @StateObject private var viewModel = LibraryModel()
     
     @FocusState private var isFocused: Bool
+    
+    let rows = [
+        GridItem(.flexible(), spacing: 50),
+        GridItem(.flexible(), spacing: 50)
+    ]
     
     var body: some View {
         
@@ -86,44 +118,93 @@ struct LibraryView: View {
                         
                         Spacer()
                         
-                        Image(.searchBook)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 150)
-                            .padding()
+                        HStack {
+                            
+                            Text("\((viewModel.lists ?? []).count) lists")
+                                .foregroundStyle(.primaryGray)
+                                .font(.system(size: 10, weight: .regular))
+                            
+                            Spacer()
+                            
+                        } // -> HStack
+                        .padding(.top, 7.5)
                         
-                        Text("Start discovering new worlds!")
-                            .foregroundStyle(.terciaryGray)
-                            .font(.system(size: 20, weight: .bold))
-                        
-                        Text("Search for books.")
-                            .foregroundStyle(.terciaryGray)
-                            .font(.system(size: 15, weight: .medium))
-                        
-                        Spacer()
+                        if let lists = viewModel.lists {
+                            
+                            ScrollView {
+                                
+                                LazyVGrid(columns: rows, spacing: 20) {
+                                    
+                                    ForEach(lists, id: \.listId) { list in
+                                        
+                                        ZStack {
+                                            
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .frame(width: 160, height: 160)
+                                                .foregroundStyle(.accent)
+                                            
+                                            VStack {
+                                                
+                                                Text("\(list.name ?? "Loading...")")
+                                                    .foregroundStyle(.primaryWhite)
+                                                    .font(.system(size: 15, weight: .regular))
+                                                
+                                            } // -> VStack
+                                            
+                                        } // -> ZStack
+                                        
+                                    } // -> ForEach
+                                    
+                                } // -> LazyVGrid
+                                .padding(.horizontal)
+                                
+                            } // -> ScrollView
+                            .scrollIndicators(.hidden)
+                            
+                        }
                         
                     } else {
                         
-//                        HStack {
-//                            
-//                            Text("\(viewModel.books.count) results")
-//                                .foregroundStyle(.primaryGray)
-//                                .font(.system(size: 10, weight: .regular))
-//                            
-//                            Spacer()
-//                            
-//                        } // -> HStack
-//                        .padding(.top, 7.5)
-//                        
-//                        SearchResult(books: $viewModel.books, viewModel: viewModel)
+                        
                         
                         Spacer()
-                            .frame(height: 120)
+//                            .frame(height: 120)
                         
                     } // -> if-else
                     
                 } // -> VStack
                 .frame(width: 350)
+                
+                
+                VStack {
+                    
+                    Spacer()
+                    
+                    HStack {
+                        
+                        Spacer()
+                        
+                        Button {
+                            viewModel.createList(name: inputText)
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .foregroundColor(.white)
+                                .background(Color.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 10)
+                                .padding(.trailing, 20)
+                        } // -> Button
+                        
+                    } // -> HStack
+                    
+                    TextField("Ingresa un texto", text: $inputText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.bottom, 100)
+                    
+                } // -> VStack
+                .zIndex(1)
                 
             } // -> ZStack
             .ignoresSafeArea()
@@ -135,6 +216,10 @@ struct LibraryView: View {
             } // -> onTapGesture
             
         } // -> NavigationVStack
+        .task {
+            try? await viewModel.loadCurrentUser()
+            try? await viewModel.loadCurrentLists()
+        } // task
         
     } // -> body
     
