@@ -17,7 +17,7 @@ struct LeafItApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RootView2()
+            TabBar()
         } // -> WindowGroup
     } // -> body
     

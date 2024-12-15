@@ -23,7 +23,7 @@ struct TabBar: View {
                     Label("Explore", systemImage: "magnifyingglass")
                 }
             
-            HomeView()
+            LibraryView()
                 .tabItem {
                     Label("Library", systemImage: "books.vertical")
                 }
