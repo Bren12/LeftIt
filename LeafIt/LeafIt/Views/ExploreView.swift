@@ -9,13 +9,9 @@ import SwiftUI
 
 struct ExploreView: View {
     
-    @StateObject var storeCarImg = StoreCarImg()
+    @ObservedObject private var viewModel = BookSearchModel()
     
-    let rows = [
-        GridItem(.flexible(), spacing: 50),
-        GridItem(.flexible(), spacing: 50),
-        GridItem(.flexible(), spacing: 50)
-    ]
+    @StateObject var storeCarImg = StoreCarImg()
     
     @State private var search: String = ""
     @State private var startSearch: Bool = false
@@ -24,134 +20,123 @@ struct ExploreView: View {
     
     var body: some View {
         
-        ZStack {
+        NavigationStack {
             
-            Color.primaryWhite
+            ZStack {
+                
+                Color.primaryWhite
             
-            VStack {
-                
-                Spacer()
-                    .frame(height: 62.5)
-                
-                HStack {
-                    
-                    ZStack {
-                        
-                        RoundedRectangle(cornerRadius: 10)
-                            .foregroundStyle(.white)
-                            .frame(height: 32.5)
-                        
-                        HStack {
-                            
-                            Spacer()
-                                .frame(width: 10)
-                            
-                            Image(systemName: "magnifyingglass")
-                                .foregroundStyle(.terciaryGray)
-                                .frame(width: 12, height: 12)
-                            
-                            TextField("Search...", text: $search)
-                                .focused($isFocused)
-                                .autocorrectionDisabled(true)
-                                .textInputAutocapitalization(.never)
-                                .onSubmit {
-                                    startSearch = search == "" ? false : true
-                                }
-                            
-                        } // -> HStack
-                        
-                    } // -> ZStack
-                    .onTapGesture {
-                        isFocused = true
-                    } // -> onTapGesture
+                VStack {
                     
                     Spacer()
-                        .frame(width: 20)
-                    
-                    Button {
-                        
-                        // Action
-                        
-                    } label: {
-                        
-                        Image(systemName: "line.3.horizontal.decrease")
-                            .foregroundStyle(.accent)
-                            .frame(width: 12, height: 12)
-                        
-                    } // -> Button
-                    
-                } // -> HStack
-                
-                if !startSearch {
-                    
-                    Spacer()
-                    
-                    Image(.searchBook)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 150)
-                        .padding()
-                    
-                    Text("Start discovering new worlds!")
-                        .foregroundStyle(.terciaryGray)
-                        .font(.system(size: 20, weight: .bold))
-                    
-                    Text("Search for books or authors.")
-                        .foregroundStyle(.terciaryGray)
-                        .font(.system(size: 15, weight: .medium))
-                    
-                    Spacer()
-                    
-                } else {
+                        .frame(height: 62.5)
                     
                     HStack {
                         
-                        Text("10 results")
-                            .foregroundStyle(.primaryGray)
-                            .font(.system(size: 10, weight: .regular))
+                        ZStack {
+                            
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundStyle(.white)
+                                .frame(height: 32.5)
+                            
+                            HStack {
+                                
+                                Spacer()
+                                    .frame(width: 10)
+                                
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundStyle(.terciaryGray)
+                                    .frame(width: 12, height: 12)
+                                
+                                TextField("Search...", text: $viewModel.searchQuery)
+                                    .foregroundStyle(.primaryBlack)
+                                    .focused($isFocused)
+                                    .autocorrectionDisabled(true)
+                                    .textInputAutocapitalization(.never)
+                                    .onSubmit {
+                                        startSearch = viewModel.searchQuery != ""
+                                        if startSearch {
+                                            viewModel.searchBook()
+                                        } // -> if
+                                    } // -> onSubmit
+                                
+                            } // -> HStack
+                            
+                        } // -> ZStack
+                        .onTapGesture {
+                            isFocused = true
+                        } // -> onTapGesture
+                        
+                        Spacer()
+                            .frame(width: 20)
+                        
+                        Button {
+                            
+                            // Action
+                            
+                        } label: {
+                            
+                            Image(systemName: "line.3.horizontal.decrease")
+                                .foregroundStyle(.accent)
+                                .frame(width: 12, height: 12)
+                            
+                        } // -> Button
+                        
+                    } // -> HStack
+                    
+                    if !startSearch {
                         
                         Spacer()
                         
-                    } // -> HStack
-                    .padding(.top, 7.5)
-                    
-                    ScrollView {
-                                        
-                        LazyVGrid(columns: rows, spacing: 20) {
-                            /////////////////////////////////////////////////////// CHANGE LOGIC HERE ///////////////////////////////////////////////////////
-                            ForEach(storeCarImg.img, id: \.id) { book in
-                                
-                                Image(book.image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .clipShape(
-                                        RoundedRectangle(cornerRadius: 10)
-                                    ) // -> clipShape
-                                    .frame(width: 100, height: 150)
-                                
-                            } // -> ForEach
-                            
-                        } // -> LazyVGrid
-                        .padding(.horizontal)
+                        Image(.searchBook)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 150)
+                            .padding()
                         
-                    } // -> ScrollView
-                    .scrollIndicators(.hidden)
+                        Text("Start discovering new worlds!")
+                            .foregroundStyle(.terciaryGray)
+                            .font(.system(size: 20, weight: .bold))
+                        
+                        Text("Search for books.")
+                            .foregroundStyle(.terciaryGray)
+                            .font(.system(size: 15, weight: .medium))
+                        
+                        Spacer()
+                        
+                    } else {
+                        
+                        HStack {
+                            
+                            Text("\(viewModel.books.count) results")
+                                .foregroundStyle(.primaryGray)
+                                .font(.system(size: 10, weight: .regular))
+                            
+                            Spacer()
+                            
+                        } // -> HStack
+                        .padding(.top, 7.5)
+                        
+                        SearchResult(books: $viewModel.books, viewModel: viewModel)
+                        
+                        Spacer()
+                            .frame(height: 120)
+                        
+                    } // -> if-else
                     
-                    Spacer()
-                    
-                } // -> if-else
+                } // -> VStack
+                .frame(width: 350)
                 
-            } // -> VStack
-            .frame(width: 350)
+            } // -> ZStack
+            .ignoresSafeArea()
+            .onAppear {
+                isFocused = true
+            } // -> onAppear
+            .onTapGesture {
+                isFocused = false
+            } // -> onTapGesture
             
-        } // -> ZStack
-        .ignoresSafeArea()
-        .onAppear {
-            isFocused = true
-        }
-        .onTapGesture {
-            isFocused = false
-        }
+        } // -> NavigationVStack
         
     } // -> body
     
