@@ -108,7 +108,7 @@ final class ReadingGoalManager {
         let data: [String: Any] = [
             DBReadingGoal.CodingKeys.bookGoal.rawValue: goal,
             DBReadingGoal.CodingKeys.bookRead.rawValue: read,
-            DBReadingGoal.CodingKeys.period.rawValue: period,
+            DBReadingGoal.CodingKeys.period.rawValue: period.rawValue,
         ] // -> data
         try await goalDocument(goalID: goalID).updateData(data)
     } // -> updateGoal

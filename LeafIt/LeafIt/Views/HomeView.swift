@@ -15,6 +15,10 @@ final class GoalModel: ObservableObject {
     @Published private(set) var user: DBUser? = nil
     @Published private(set) var readGoal: DBReadingGoal? = nil
     
+    @Published var periodSelected: String = Period.month.rawValue
+    @Published var readBook: String = ""
+    @Published var goalBook: String = ""
+    
     func loadCurrentUser() async throws {
         let authDataResult = try AuthenticationManager.shared.getAuthenticatedUser()
         print(authDataResult)
@@ -28,23 +32,25 @@ final class GoalModel: ObservableObject {
         }
     } // -> getCurrGoal
     
-    func createGoal(read: Int, goal: Int, period: Period) {
+    func createGoal() {
         guard let user else { return }
+        guard let readInt = Int(readBook), let goalInt = Int(goalBook), let periodEnum = Period(rawValue: periodSelected), goalInt != 0, readInt <= goalInt else { return }
         Task {
-            try await ReadingGoalManager.shared.createGoal(user: user.userId, read: read, goal: goal, period: period)
+            try await ReadingGoalManager.shared.createGoal(user: user.userId, read: readInt, goal: goalInt, period: periodEnum)
             self.readGoal = try await ReadingGoalManager.shared.getCurrGoal(forUserId: user.userId)
         }
     } // -> createGoal
     
-    func updateGoal(read: Int, goal: Int, period: Period) {
+    func updateGoal() {
         guard let readGoal, let goalId = readGoal.goalId else { return }
+        guard let readInt = Int(readBook), let goalInt = Int(goalBook), let periodEnum = Period(rawValue: periodSelected), goalInt != 0, readInt <= goalInt else { return }
         Task {
-            try await ReadingGoalManager.shared.updateGoal(goalID: goalId, read: read, goal: goal, period: period)
+            try await ReadingGoalManager.shared.updateGoal(goalID: goalId, read: readInt, goal: goalInt, period: periodEnum)
             self.readGoal = try await ReadingGoalManager.shared.getGoal(goalID: goalId)
         }
     } // -> updateGoal
     
-    func deleteGoal(read: Int, goal: Int, period: Period) {
+    func deleteGoal() {
         guard let readGoal, let goalId = readGoal.goalId else { return }
         Task {
             try await ReadingGoalManager.shared.deleteGoal(goalID: goalId)
@@ -60,11 +66,7 @@ struct HomeView: View {
     
     @StateObject private var viewModel = GoalModel()
     
-    @State private var periodSelected: String = Period.month.rawValue
-    @State private var readBook: String = ""
-    @State private var goalBook: String = ""
     @State var showSheet = false
-    
     
     @StateObject var storeCarImg = StoreCarImg()
     var imgSet = ["book1", "book2", "book3"]
@@ -262,198 +264,13 @@ struct HomeView: View {
             
         } // -> ZStack
         .ignoresSafeArea()
-        .task {
+        .task { // MARK: TASK
             try? await viewModel.loadCurrentUser()
             try? await viewModel.getCurrGoal()
         }
-        .sheet(isPresented: $showSheet) {
-            
-            // MARK: SHEET
-            
-            ZStack {
-                
-                VStack {
-                    
-                    Spacer()
-                        .frame(height: 30)
-                    
-                    Text("📚 Goal Progress 📚")
-                        .foregroundStyle(.primaryBlack)
-                        .font(.system(size: 25, weight: .bold))
-                    
-                    Divider()
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    HStack {
-                        
-                        Text("Time lapse")
-                            .foregroundStyle(.primaryBlack)
-                            .font(.system(size: 15, weight: .bold))
-                        
-                        Spacer()
-                        
-                    } // -> HStack
-                    
-                    HStack {
-                        
-                        ForEach(Period.allCases, id: \.self) { period in
-                            
-                            Button {
-                                periodSelected = period.rawValue
-                            } label: {
-                                
-                                ZStack {
-                                    
-                                    if periodSelected == period.rawValue {
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .foregroundStyle(.accent)
-                                            .frame(width: 100, height: 27)
-                                    } else {
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .stroke(.accent, lineWidth: 1)
-                                            .frame(width: 100, height: 27)
-                                    }
-                                    
-                                    Text("\(period.rawValue)")
-                                        .foregroundStyle(periodSelected == period.rawValue ? .primaryWhite : .accent)
-                                        .font(.system(size: 12, weight: .regular))
-                                    
-                                } // -> ZStack
-                                
-                            } // -> Button
-                            
-                        } // -> ForEach
-                        
-                        Spacer()
-                        
-                    } // -> HStack
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    Divider()
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    HStack {
-                        
-                        Text("Books read this year")
-                            .foregroundStyle(.primaryBlack)
-                            .font(.system(size: 15, weight: .bold))
-                        
-                        Spacer()
-                        
-                    } // -> HStack
-                    
-                    ZStack {
-                        
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(.secondaryGray, lineWidth: 1)
-                            .frame(height: 27)
-                        
-                        HStack {
-                            
-                            Spacer()
-                                .frame(width: 10)
-                            
-                            TextField("Ex. 2", text: $readBook)
-                                .foregroundStyle(.primaryBlack)
-                                .keyboardType(.numberPad)
-                                .onChange(of: readBook) { newValue in
-                                    readBook = newValue.filter { $0.isNumber }
-                                } // -> onChange
-                            
-                        } // -> HStack
-                        
-                    } // -> ZStack
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    Divider()
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    HStack {
-                        
-                        Text("Year goal of books to read")
-                            .foregroundStyle(.primaryBlack)
-                            .font(.system(size: 15, weight: .bold))
-                        
-                        Spacer()
-                        
-                    } // -> HStack
-                    
-                    ZStack {
-                        
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(.secondaryGray, lineWidth: 1)
-                            .frame(height: 27)
-                        
-                        HStack {
-                            
-                            Spacer()
-                                .frame(width: 10)
-                            
-                            TextField("Ex. 9", text: $goalBook)
-                                .foregroundStyle(.primaryBlack)
-                                .keyboardType(.numberPad)
-                                .onChange(of: goalBook) { newValue in
-                                    goalBook = newValue.filter { $0.isNumber }
-                                } // -> onChange
-                            
-                        } // -> HStack
-                        
-                    } // -> ZStack
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    Divider()
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    Button {
-                        
-                        if let readInt = Int(readBook), let goalInt = Int(goalBook), let periodEnum = Period(rawValue: periodSelected), goalInt != 0, readInt <= goalInt {
-                            
-                            if viewModel.readGoal == nil {
-                                viewModel.createGoal(read: readInt, goal: goalInt, period: periodEnum)
-                            } else {
-                                viewModel.updateGoal(read: readInt, goal: goalInt, period: periodEnum)
-                            } // -> if-else
-                            
-                        } // -> if
-                        
-                    } label: {
-                        
-                        ZStack {
-                            
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundStyle(.accent)
-                                .frame(height: 40)
-                            
-                            Text("Set Goal")
-                                .foregroundStyle(.primaryWhite)
-                                .font(.system(size: 15, weight: .semibold))
-                            
-                        } // -> ZStack
-                        
-                    } // -> Button
-                    
-                    Spacer()
-                    
-                } // -> VStack
-                .frame(width: 350)
-                
-            } // -> ZStack
-            .presentationDetents([.medium,.large])
-            
+        .sheet(isPresented: $showSheet) { // MARK: SHEET
+            GoalSheetView(viewModel: viewModel, showSheet: $showSheet)
+                .presentationDetents([.medium])
         } // -> sheet
         
     } // -> body

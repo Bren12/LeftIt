@@ -27,14 +27,16 @@ struct GoalCard: View {
             
             HStack {
                 
+                Spacer()
+                    .frame(width: 20)
+                
                 BookIcon(viewModel: viewModel)
                 
                 VStack(alignment: .leading) {
-                    
+                                        
                     Text("\( (viewModel.readGoal?.period?.rawValue ?? "") + (viewModel.readGoal?.period?.rawValue != nil ? " " : "") )Goal Progress")
                         .foregroundStyle(.primaryBlack)
                         .font(.system(size: 15, weight: .medium))
-                        .frame(width: 148)
                     
                     if let readGoal = viewModel.readGoal, let goal = readGoal.bookGoal, let read = readGoal.bookRead {
                         Text("\(read) / \(goal) books")
@@ -49,7 +51,6 @@ struct GoalCard: View {
                 } // -> VStack
                 
                 Spacer()
-                    .frame(width: 50)
                 
                 Button {
                     
@@ -70,7 +71,11 @@ struct GoalCard: View {
                     
                 } // -> Button
                 
+                Spacer()
+                    .frame(width: 20)
+                
             } // -> HStack
+            .frame(width: 350)
             
         } // -> ZStack
         
