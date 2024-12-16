@@ -134,7 +134,7 @@ struct ProfileView: View {
             try? await viewModel.loadCurrentUser()
             print("HELLOOOOO")
             print(viewModel.user ?? false)
-        } // onAppear
+        } // task
         .navigationTitle ("Profile")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

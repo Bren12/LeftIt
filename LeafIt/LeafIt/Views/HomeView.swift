@@ -7,10 +7,68 @@
 
 import SwiftUI
 
+// MARK: GoalModel
+
+@MainActor
+final class GoalModel: ObservableObject {
+    
+    @Published private(set) var user: DBUser? = nil
+    @Published private(set) var readGoal: DBReadingGoal? = nil
+    
+    @Published var periodSelected: String = Period.month.rawValue
+    @Published var readBook: String = ""
+    @Published var goalBook: String = ""
+    
+    func loadCurrentUser() async throws {
+        let authDataResult = try AuthenticationManager.shared.getAuthenticatedUser()
+        print(authDataResult)
+        self.user = try await UserManager.shared.getUser(userID: authDataResult.uid)
+    } // -> loadCurrentUser
+    
+    func getCurrGoal() async throws {
+        guard let user else { return }
+        Task {
+            self.readGoal = try await ReadingGoalManager.shared.getCurrGoal(forUserId: user.userId)
+        }
+    } // -> getCurrGoal
+    
+    func createGoal() {
+        guard let user else { return }
+        guard let readInt = Int(readBook), let goalInt = Int(goalBook), let periodEnum = Period(rawValue: periodSelected), goalInt != 0, readInt <= goalInt else { return }
+        Task {
+            try await ReadingGoalManager.shared.createGoal(user: user.userId, read: readInt, goal: goalInt, period: periodEnum)
+            self.readGoal = try await ReadingGoalManager.shared.getCurrGoal(forUserId: user.userId)
+        }
+    } // -> createGoal
+    
+    func updateGoal() {
+        guard let readGoal, let goalId = readGoal.goalId else { return }
+        guard let readInt = Int(readBook), let goalInt = Int(goalBook), let periodEnum = Period(rawValue: periodSelected), goalInt != 0, readInt <= goalInt else { return }
+        Task {
+            try await ReadingGoalManager.shared.updateGoal(goalID: goalId, read: readInt, goal: goalInt, period: periodEnum)
+            self.readGoal = try await ReadingGoalManager.shared.getGoal(goalID: goalId)
+        }
+    } // -> updateGoal
+    
+    func deleteGoal() {
+        guard let readGoal, let goalId = readGoal.goalId else { return }
+        Task {
+            try await ReadingGoalManager.shared.deleteGoal(goalID: goalId)
+            self.readGoal = nil
+        }
+    } // -> deleteGoal
+    
+} // -> LibraryModel
+
+// MARK: HomeView
+
 struct HomeView: View {
     
-    @StateObject var storeCarImg = StoreCarImg()
+    @StateObject private var viewModel = GoalModel()
     
+    @State var showSheet = false
+    
+    @StateObject var storeCarImg = StoreCarImg()
     var imgSet = ["book1", "book2", "book3"]
     
     var body: some View {
@@ -22,6 +80,8 @@ struct HomeView: View {
             ScrollView {
                 
                 VStack {
+                    
+                    // MARK: Header
                     
                     Spacer()
                         .frame(height: 62.5)
@@ -39,7 +99,7 @@ struct HomeView: View {
                     
                     HStack {
                         
-                        Text("Dmitriy Smoljaninov")
+                        Text("\(viewModel.user?.nickname ?? readerUser)")
                             .foregroundStyle(.primaryBlack)
                             .font(.system(size: 20, weight: .semibold))
                         
@@ -48,10 +108,12 @@ struct HomeView: View {
                     } // -> HStack
                     .frame(width: 350)
                     
-                    GoalCard()
+                    GoalCard(viewModel: viewModel, showSheet: $showSheet)
                     
                     Spacer()
                         .frame(height: 30)
+                    
+                    // MARK: Reading
                     
                     HStack {
                         
@@ -76,6 +138,8 @@ struct HomeView: View {
                     
                     Spacer()
                         .frame(height: 20)
+                    
+                    // MARK: Recommendations 1
                     
                     HStack {
                         
@@ -134,6 +198,8 @@ struct HomeView: View {
                     Spacer()
                         .frame(height: 30)
                     
+                    // MARK: Recommendations 2
+                    
                     HStack {
                         
                         Text("Recently published")
@@ -156,7 +222,7 @@ struct HomeView: View {
                                 VStack {
                                     
                                     Button {
-                                        // ACTION
+                                        //
                                     } label: {
                                         
                                         Image(img.image)
@@ -198,6 +264,14 @@ struct HomeView: View {
             
         } // -> ZStack
         .ignoresSafeArea()
+        .task { // MARK: TASK
+            try? await viewModel.loadCurrentUser()
+            try? await viewModel.getCurrGoal()
+        }
+        .sheet(isPresented: $showSheet) { // MARK: SHEET
+            GoalSheetView(viewModel: viewModel, showSheet: $showSheet)
+                .presentationDetents([.medium])
+        } // -> sheet
         
     } // -> body
     

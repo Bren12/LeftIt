@@ -9,6 +9,10 @@ import SwiftUI
 
 struct GoalCard: View {
     
+    @ObservedObject var viewModel: GoalModel
+    
+    @Binding var showSheet: Bool
+    
     var body: some View {
         
         ZStack {
@@ -23,26 +27,34 @@ struct GoalCard: View {
             
             HStack {
                 
-                BookIcon()
+                Spacer()
+                    .frame(width: 20)
+                
+                BookIcon(viewModel: viewModel)
                 
                 VStack(alignment: .leading) {
-                    
-                    Text("Year Goal Progress")
+                                        
+                    Text("\( (viewModel.readGoal?.period?.rawValue ?? "") + (viewModel.readGoal?.period?.rawValue != nil ? " " : "") )Goal Progress")
                         .foregroundStyle(.primaryBlack)
                         .font(.system(size: 15, weight: .medium))
                     
-                    Text("6/12 books")
-                        .foregroundStyle(.primaryGray)
-                        .font(.system(size: 10, weight: .regular))
+                    if let readGoal = viewModel.readGoal, let goal = readGoal.bookGoal, let read = readGoal.bookRead {
+                        Text("\(read) / \(goal) books")
+                            .foregroundStyle(.primaryGray)
+                            .font(.system(size: 10, weight: .regular))
+                    } else {
+                        Text("Let’s set a new goal!")
+                            .foregroundStyle(.primaryGray)
+                            .font(.system(size: 10, weight: .regular))
+                    }
                     
                 } // -> VStack
                 
                 Spacer()
-                    .frame(width: 50)
                 
                 Button {
                     
-                    // ACTION
+                    showSheet.toggle()
                     
                 } label: {
                     
@@ -59,7 +71,11 @@ struct GoalCard: View {
                     
                 } // -> Button
                 
+                Spacer()
+                    .frame(width: 20)
+                
             } // -> HStack
+            .frame(width: 350)
             
         } // -> ZStack
         
@@ -68,5 +84,5 @@ struct GoalCard: View {
 } // -> GoalCard
 
 #Preview {
-    GoalCard()
+    GoalCard(viewModel: GoalModel(), showSheet: .constant(false))
 } // -> Preview

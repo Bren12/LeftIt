@@ -26,7 +26,6 @@ final class UserManager {
     
     private let encoder: Firestore.Encoder = {
         let encoder = Firestore.Encoder()
-//        encoder.keyEncodingStrategy = .convertToSnakeCase
         return encoder
     }() // -> encoder
 
@@ -34,7 +33,6 @@ final class UserManager {
 
     private let decoder: Firestore.Decoder = {
         let decoder = Firestore.Decoder()
-//        decoder.keyDecodingStrategy = .convertFromSnakeCase
         return decoder
     }() // -> decoder
     
@@ -42,6 +40,7 @@ final class UserManager {
     
     func createNewUser(user: DBUser) async throws {
         try userDocument(userID: user.userId).setData(from: user, merge: false)
+        try await ListManager.shared.createDefaultList(user: user.userId)
     } // -> createNewUser
     
     

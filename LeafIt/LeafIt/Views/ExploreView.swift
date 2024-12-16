@@ -13,7 +13,6 @@ struct ExploreView: View {
     
     @StateObject var storeCarImg = StoreCarImg()
     
-    @State private var search: String = ""
     @State private var startSearch: Bool = false
     
     @FocusState private var isFocused: Bool
