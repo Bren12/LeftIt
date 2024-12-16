@@ -78,7 +78,6 @@ final class ListManager {
         return lists
     }
     
-    // Obtener una lista específica
     func getList(listID: String) async throws -> DBList? {
         let document = try await listDocument(listID: listID).getDocument()
 

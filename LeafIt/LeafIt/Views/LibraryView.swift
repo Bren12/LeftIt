@@ -137,21 +137,27 @@ struct LibraryView: View {
                                     
                                     ForEach(lists, id: \.listId) { list in
                                         
-                                        ZStack {
+                                        NavigationLink {
+                                            EmptyView()
+                                        } label: {
                                             
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .frame(width: 160, height: 160)
-                                                .foregroundStyle(.accent)
-                                            
-                                            VStack {
+                                            ZStack {
                                                 
-                                                Text("\(list.name ?? "Loading...")")
-                                                    .foregroundStyle(.primaryWhite)
-                                                    .font(.system(size: 15, weight: .regular))
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .frame(width: 160, height: 160)
+                                                    .foregroundStyle(.accent)
                                                 
-                                            } // -> VStack
+                                                VStack {
+                                                    
+                                                    Text("\(list.name ?? "Loading...")")
+                                                        .foregroundStyle(.primaryWhite)
+                                                        .font(.system(size: 15, weight: .regular))
+                                                    
+                                                } // -> VStack
+                                                
+                                            } // -> ZStack
                                             
-                                        } // -> ZStack
+                                        } // -> NavigationLink
                                         
                                     } // -> ForEach
                                     

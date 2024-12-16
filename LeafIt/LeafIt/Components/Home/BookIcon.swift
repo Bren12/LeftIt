@@ -9,6 +9,8 @@ import SwiftUI
 
 struct BookIcon: View {
     
+    @ObservedObject var viewModel: GoalModel
+    
     var body: some View {
         
         ZStack {
@@ -34,7 +36,7 @@ struct BookIcon: View {
                             
                             Divider()
                             
-                            Text("0")
+                            Text("\(viewModel.user?.streak ?? 0)")
                                 .foregroundStyle(.primaryBlack)
                             
                         } // -> HStack
@@ -57,5 +59,5 @@ struct BookIcon: View {
 } // -> BookIcon
 
 #Preview {
-    BookIcon()
+    BookIcon(viewModel: GoalModel())
 } // -> Preview

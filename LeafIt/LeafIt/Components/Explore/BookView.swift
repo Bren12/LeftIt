@@ -68,8 +68,16 @@ struct BookView: View {
                 }
                 .padding()
                 
+                Divider()
+                
                 HStack {
                     Text("\(pageCount) pages")
+                }
+                
+                Divider()
+                
+                Button("Add to list") {
+                    
                 }
             }
         }
