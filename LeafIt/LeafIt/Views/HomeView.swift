@@ -269,9 +269,9 @@ struct HomeView: View {
             } // -> ZStack
             .ignoresSafeArea()
             .task { // MARK: TASK
-    //            try? await viewModel.loadCurrentUser()
-    //            try? await viewModel.getCurrGoal()
-    //            try? await viewModel.getCurrBooks()
+                try? await viewModel.loadCurrentUser()
+                try? await viewModel.getCurrGoal()
+                try? await viewModel.getCurrBooks()
             }
             .sheet(isPresented: $showSheet) { // MARK: SHEET
                 GoalSheetView(viewModel: viewModel, showSheet: $showSheet)

@@ -20,7 +20,7 @@ struct DBList: Codable {
         case name = "name"
         case photoUrl = "photo_rl"
         case dateCreated = "date_created"
-    } // -> enum
+    }
     
     init(
         userId: String,
@@ -34,7 +34,7 @@ struct DBList: Codable {
         self.name = name
         self.photoUrl = photoUrl
         self.dateCreated = dateCreated
-    } // -> init
+    }
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -43,7 +43,7 @@ struct DBList: Codable {
         self.name = try container.decodeIfPresent(String.self, forKey: .name)
         self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
         self.dateCreated = try container.decodeIfPresent(Date.self, forKey: .dateCreated)
-    } // -> Decoder
+    }
     
     
     
@@ -54,6 +54,6 @@ struct DBList: Codable {
         try container.encodeIfPresent(self.name, forKey: .name)
         try container.encodeIfPresent(self.photoUrl, forKey: .photoUrl)
         try container.encodeIfPresent(self.dateCreated, forKey: .dateCreated)
-    } // -> Encoder
+    }
     
-} // -> DBList
+}

@@ -49,6 +49,7 @@ final class BookManager {
     // MARK: Create Book
     
     func createNewBook(user: String, bookGB: Book, list: [String], pages: Int, readPages: Int, completed: Bool) async throws {
+        print(bookGB)
         guard let volume = bookGB.volumeInfo else { return }
         var book = DBBook(
             userId: user,
@@ -56,6 +57,7 @@ final class BookManager {
             listId: list,
             title: volume.title,
             authors: volume.authors,
+            description: volume.description,
             pages: volume.pageCount,
             readPages: readPages,
             progress: (readPages*100)/pages,
@@ -84,16 +86,20 @@ final class BookManager {
     
     // MARK: Get Books from List
 
-    func getBooksDefaultList(forUserID: String) async throws -> [DBBook] {
-        let listID = try await ListManager.shared.getDefaultList(forUserId: forUserID)
+    func getBooksDefaultList(forUserID: String) async throws -> [DBBook]? {
+        let list: DBList = try await ListManager.shared.getDefaultList(forUserId: forUserID)
+        guard let listID = list.listId else { return [] }
         let snapshot = try await bookCollection
-            .whereField(DBList.CodingKeys.userId.rawValue, isEqualTo: forUserID)
-            .whereField(DBList.CodingKeys.listId.rawValue, isEqualTo: listID)
+            .whereField(DBBook.CodingKeys.userId.rawValue, isEqualTo: forUserID)
+            .whereField(DBBook.CodingKeys.listId.rawValue, arrayContains: listID)
             .getDocuments()
         let books = snapshot.documents.compactMap { document -> DBBook? in
-            try? document.data(as: DBBook.self, decoder: decoder)
+            guard let book = try? document.data(as: DBBook.self) else {
+                return nil
+            } // -> goal
+            return book
         } // -> book
-        return books
+        return books.count == 0 ? nil : books
     } // -> getBookDefaultList
     
     
@@ -102,31 +108,42 @@ final class BookManager {
 
     func getBooksList(forListId: String) async throws -> [DBBook] {
         let snapshot = try await bookCollection
-            .whereField(DBList.CodingKeys.listId.rawValue, isEqualTo: forListId)
+            .whereField(DBBook.CodingKeys.listId.rawValue, arrayContains: forListId)
             .getDocuments()
         let books = snapshot.documents.compactMap { document -> DBBook? in
-            try? document.data(as: DBBook.self, decoder: decoder)
+            try? document.data(as: DBBook.self)
         } // -> book
         return books
     } // -> getBookList
     
     
     
+    // MARK: Get Book from User and BookGB
+
+    func getBookUser(fromUser: String, fromBookGB: String) async throws -> DBBook? {
+        let snapshot = try await bookCollection
+            .whereField(DBBook.CodingKeys.userId.rawValue, isEqualTo: fromUser)
+            .whereField(DBBook.CodingKeys.bookGb.rawValue, isEqualTo: fromBookGB)
+            .getDocuments()
+        let books = snapshot.documents.compactMap { document -> DBBook? in
+            guard let book = try? document.data(as: DBBook.self) else {
+                return nil
+            } // -> goal
+            return book
+        } // -> books
+        return books.first
+    } // -> getBookUser
+    
+    
+    
     // MARK: Update Book List
 
-    func addBookList(forBookId: String, list: String) async throws {
+    func updateBookList(forBookId: String, list: [String]) async throws {
         let data: [String: Any] = [
-            DBBook.CodingKeys.listId.rawValue: FieldValue.arrayUnion([list]),
+            DBBook.CodingKeys.listId.rawValue: list,
         ] // -> data
         try await bookDocument(bookID: forBookId).updateData(data)
     } // -> addBookList
-    
-    func removeBookList(forBookId: String, list: String) async throws {
-        let data: [String: Any] = [
-            DBBook.CodingKeys.listId.rawValue: FieldValue.arrayRemove([list]),
-        ] // -> data
-        try await bookDocument(bookID: forBookId).updateData(data)
-    } // -> removeBookList
     
     
     
@@ -135,6 +152,21 @@ final class BookManager {
     func updateBookCompleted(forBookId: String, isCompleted: Bool) async throws {
         let data: [String: Any] = [
             DBBook.CodingKeys.completed.rawValue: isCompleted,
+        ] // -> data
+        try await bookDocument(bookID: forBookId).updateData(data)
+    } // -> updateBookCompleted
+    
+    
+    
+    // MARK: Update Book Completed
+    
+    func updateBook(forBookId: String, list: [String], pages: Int, readPages: Int, isCompleted: Bool) async throws {
+        let data: [String: Any] = [
+            DBBook.CodingKeys.listId.rawValue: list,
+            DBBook.CodingKeys.pages.rawValue: pages,
+            DBBook.CodingKeys.readPages.rawValue: readPages,
+            DBBook.CodingKeys.completed.rawValue: isCompleted,
+            DBBook.CodingKeys.progress.rawValue: (readPages*100)/pages,
         ] // -> data
         try await bookDocument(bookID: forBookId).updateData(data)
     } // -> updateBookCompleted

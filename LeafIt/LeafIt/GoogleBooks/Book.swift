@@ -31,11 +31,48 @@ struct VolumeInfo: Codable {
     let maturityRating: String?
     let imageLinks: ImageLinks?
     let language: String?
+    
+    init(title: String,
+         subtitle: String? = nil,
+         authors: [String]? = nil,
+         publisher: String? = nil,
+         publishedDate: String? = nil,
+         description: String? = nil,
+         pageCount: Int? = nil,
+         averageRating: Float? = nil,
+         ratingsCount: Int? = nil,
+         categories: [String]? = nil,
+         maturityRating: String? = nil,
+         imageLinks: ImageLinks? = nil,
+         language: String? = nil
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.authors = authors
+        self.publisher = publisher
+        self.publishedDate = publishedDate
+        self.description = description
+        self.pageCount = pageCount
+        self.averageRating = averageRating
+        self.ratingsCount = ratingsCount
+        self.categories = categories
+        self.maturityRating = maturityRating
+        self.imageLinks = imageLinks
+        self.language = language
+    }
 }
 
 struct ImageLinks: Codable {
     let smallThumbnail: String?
     let thumbnail: String?
+    
+    init(
+        smallThumbnail: String? = nil,
+         thumbnail: String? = nil
+    ) {
+        self.smallThumbnail = smallThumbnail
+        self.thumbnail = thumbnail
+    }
 }
 
 struct SampleBook {

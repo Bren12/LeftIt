@@ -17,10 +17,12 @@ class CarouselStoreModel: ObservableObject {
     
     init(bookList: [DBBook]) {
         var auxList: [CarouselStore] = []
-        for i in 0...(bookList.count-1) {
-            let new = CarouselStore(id: i, book: bookList[i])
-            auxList.append(new)
-        } // -> for
+        if bookList.count > 0 {
+            for i in 0...(bookList.count-1) {
+                let new = CarouselStore(id: i, book: bookList[i])
+                auxList.append(new)
+            } // -> for
+        } // -> if
         self.books = auxList
     } // -> setBooks
     
