@@ -11,8 +11,6 @@ struct ExploreView: View {
     
     @ObservedObject private var viewModel = BookSearchModel()
     
-    @StateObject var storeCarImg = StoreCarImg()
-    
     @State private var startSearch: Bool = false
     
     @FocusState private var isFocused: Bool

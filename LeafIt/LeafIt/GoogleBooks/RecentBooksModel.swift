@@ -1,35 +1,30 @@
 //
-//  BookSearchModel.swift
+//  RecentBooksModel.swift
 //  LeafIt
 //
-//  Created by Brenda Elena Saucedo Gonzalez on 14/12/24.
+//  Created by Brenda Elena Saucedo Gonzalez on 17/12/24.
 //
 
 import Foundation
 
-class BookSearchModel: ObservableObject {
+class RecentBooksModel: ObservableObject {
     
-    @Published var searchQuery: String = ""
-    @Published var errorMessage: String = ""
     @Published var books = [Book]()
-    @Published var showBookDisplayView = false
     @Published var isLoading = false
-    private var startIndex = 0
     
-    func resetSearch() {
-        self.books = []
-    } // -> resetSearch
-    
-    func searchBook() {
-        
-        guard !searchQuery.isEmpty else { return }
+    init() {
         
         print("searching")
         
+        let currDate = Date()
+        let calendar = Calendar.current
+        let currYear = calendar.component(.year, from: currDate)
+        
         var url = URL(string: bookURL)!
         let queryItems: [URLQueryItem] = [
-            URLQueryItem(name: "q", value: searchQuery),
-            URLQueryItem(name: "startIndex", value: "\(startIndex)"),
+            URLQueryItem(name: "q", value: "*"),
+            URLQueryItem(name: "categories", value: "Fiction"),
+            URLQueryItem(name: "orderBy", value: "relevance"),
             URLQueryItem(name: "maxResults", value: "18"),
 //            URLQueryItem(name: "key", value: apiKey)
         ]
@@ -55,12 +50,7 @@ class BookSearchModel: ObservableObject {
                 let searchResponse = try decoder.decode(BookSearchResponse.self, from: data)
                 
                 DispatchQueue.main.async {
-                    if self.startIndex == 0 {
-                        self.books = searchResponse.items ?? []
-                    } else {
-                        self.books.append(contentsOf: searchResponse.items ?? [])
-                    } // -> if-else
-                    self.showBookDisplayView.toggle()
+                    self.books = searchResponse.items ?? []
                     self.isLoading = false
                     print("search succesful")
                 } // -> DispatchQueue
@@ -74,13 +64,6 @@ class BookSearchModel: ObservableObject {
             
         } // -> URLSession
         .resume()
-        
-    } // -> searchBook
-    
-    func loadMoreBooks() {
-        print("Loading more book")
-        startIndex += 18
-        searchBook()
-    } // -> loadMoreBooks
+    }
     
 } // -> BookSearchModel

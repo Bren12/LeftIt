@@ -66,27 +66,39 @@ final class ListManager {
     
     // MARK: Get List
     
+    func getDefaultList(forUserId: String) async throws -> DBList {
+        let snapshot = try await listCollection
+            .whereField(DBList.CodingKeys.userId.rawValue, isEqualTo: forUserId)
+            .whereField(DBList.CodingKeys.name.rawValue, isEqualTo: "Now Reading")
+            .getDocuments()
+        guard let document = snapshot.documents.first else {
+            throw NSError(domain: "FirestoreError", code: 404, userInfo: [NSLocalizedDescriptionKey: "No document found for the specified criteria"])
+        } // -> document
+        do {
+            let list = try document.data(as: DBList.self, decoder: decoder)
+            return list
+        } catch {
+            throw NSError(domain: "FirestoreError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error decoding document data"])
+        } // -> do-catch
+    } // -> getDefaultList
+    
     func getLists(forUserId: String) async throws -> [DBList] {
         let snapshot = try await listCollection
             .whereField(DBList.CodingKeys.userId.rawValue, isEqualTo: forUserId)
             .getDocuments()
-        
-        // Decodificar los documentos en un array de DBList
         let lists = snapshot.documents.compactMap { document -> DBList? in
             try? document.data(as: DBList.self, decoder: decoder)
-        }
+        } // -> lists
         return lists
-    }
+    } // -> getLists
     
     func getList(listID: String) async throws -> DBList? {
         let document = try await listDocument(listID: listID).getDocument()
-
         guard let list = try? document.data(as: DBList.self) else {
             return nil
-        }
-        
+        } // -> list
         return list
-    }
+    } // -> getList
     
     
 } // -> ListManager

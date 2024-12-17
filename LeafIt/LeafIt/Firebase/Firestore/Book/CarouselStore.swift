@@ -7,8 +7,7 @@
 
 import Foundation
 
-struct Img: Identifiable {
+struct CarouselStore: Identifiable {
     var id: Int
-    var image: String
-    var progress: Int
+    var book: DBBook
 }

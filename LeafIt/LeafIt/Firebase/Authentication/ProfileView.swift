@@ -131,9 +131,9 @@ struct ProfileView: View {
             
         } // -> List
         .task {
-            try? await viewModel.loadCurrentUser()
-            print("HELLOOOOO")
-            print(viewModel.user ?? false)
+//            try? await viewModel.loadCurrentUser()
+//            print("HELLOOOOO")
+//            print(viewModel.user ?? false)
         } // task
         .navigationTitle ("Profile")
         .toolbar {

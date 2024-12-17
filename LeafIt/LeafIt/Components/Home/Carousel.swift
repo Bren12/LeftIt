@@ -9,7 +9,8 @@ import SwiftUI
 
 struct Carousel: View {
     
-    @StateObject var storeCarImg = StoreCarImg()
+    @ObservedObject var viewModel: CarouselStoreModel
+    
     @State private var centerImg = 0.0
     @State private var draggingImg = 0.0
     
@@ -17,94 +18,98 @@ struct Carousel: View {
         
         ZStack {
             
-            ForEach(storeCarImg.img) { img in
+            ForEach(viewModel.books, id: \.id) { book in
                 
                 ZStack {
                     
                     VStack {
                         
-                        Image(img.image)
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: 10)
-                            ) // -> clipShape
-                            .shadow(
-                                radius: 4,
-                                y: 4
-                            )
+                        AsyncImage(url: URL(string: book.book.photoUrl!)) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .clipShape(
+                                    RoundedRectangle(cornerRadius: 10)
+                                ) // -> clipShape
+                                .shadow(
+                                    radius: 4,
+                                    y: 4
+                                )
+                        } placeholder: {
+                            ProgressView()
+                        } // -> AsyncImage
                         
                         VStack {
                             
-                            if xOffset(img.id) == 0 {
-                                
+                            if xOffset(book.id) == 0 {
+    
                                 HStack {
-                                    
-                                    Text("\(img.progress)%")
+    
+                                    Text("\(book.book.progress ?? 0)%")
                                         .foregroundStyle(.accent)
                                         .font(.system(size: 10, weight: .semibold))
                                         .frame(width: 30, height: 7)
-                                    
+    
                                     RoundedRectangle(cornerRadius: 10)
                                         .frame(width: 148, height: 7)
                                         .foregroundStyle(.secondaryGray)
                                         .overlay(
-                                            
+
                                             HStack {
-                                                
+    
                                                 Spacer()
-                                                    .frame(width: Double(img.progress) * 1.48 > 141.0 ? 7 : 0)
-                                                
+                                                    .frame(width: Double(book.book.progress ?? 0) * 1.48 > 141.0 ? 7 : 0)
+
                                                 RoundedRectangle(cornerRadius: 10)
-                                                    .frame(width: Double(img.progress) * 1.48, height: 7)
+                                                    .frame(width: Double(book.book.progress ?? 0) * 1.48, height: 7)
                                                     .foregroundStyle(.accent)
-                                                
+
                                                 Spacer()
-                                                
+
                                             } // -> HStack
-                                            
+
                                         ) // -> overlay
-                                    
-                                }
-                                
-                                Spacer()
-                                    .frame(height: 10)
-                                
-                                Button {
-                                    
-                                    // ACTION
-                                    
-                                } label: {
-                                    
-                                    ZStack {
-                                        
-                                        RoundedRectangle(cornerRadius: 5)
-                                            .foregroundStyle(.accent)
-                                            .frame(width: 75, height: 30)
-                                        
-                                        Text("Continue")
-                                            .foregroundStyle(.white)
-                                            .font(.system(size: 10, weight: .semibold))
-                                        
-                                    } // -> ZStack
-                                    
-                                } // -> Button
-                                
+    
+                                    } // -> HStack
+    
+                                    Spacer()
+                                        .frame(height: 10)
+    
+                                    Button {
+    
+                                        // ACTION
+    
+                                    } label: {
+    
+                                        ZStack {
+    
+                                            RoundedRectangle(cornerRadius: 5)
+                                                .foregroundStyle(.accent)
+                                                .frame(width: 75, height: 30)
+    
+                                            Text("Continue")
+                                                .foregroundStyle(.white)
+                                                .font(.system(size: 10, weight: .semibold))
+    
+                                        } // -> ZStack
+    
+                                    } // -> Button
+    
                             } // -> if
                             
-                        } // -> HStack
+                        } // -> VStack
                         .frame(width: 178, height: 50)
                         
                     } // -> VStack
                     
                 } // -> ZStack
                 .frame(width: 180, height: 350)
-                .scaleEffect(max(0.25, 1.0 - abs(distance(img.id)) * 0.25 ))
-                .offset(x: xOffset(img.id), y: 0)
-                .zIndex(1.0 - abs(distance(img.id)) * 0.1)
+                .scaleEffect(max(0.25, 1.0 - abs(distance(book.id)) * 0.25 ))
+                .offset(x: xOffset(book.id), y: 0)
+                .zIndex(1.0 - abs(distance(book.id)) * 0.1)
                 .onTapGesture {
                     withAnimation {
-                        draggingImg = Double(img.id)
+                        draggingImg = Double(book.id)
                     } // -> withAnimation
                 } // -> onTapGesture
                 
@@ -126,7 +131,7 @@ struct Carousel: View {
                 withAnimation {
                     
                     draggingImg = centerImg + value.predictedEndTranslation.width / 100
-                    draggingImg = round(draggingImg).remainder(dividingBy: Double(storeCarImg.img.count))
+                    draggingImg = round(draggingImg).remainder(dividingBy: Double(viewModel.books.count))
                     centerImg = draggingImg
                     
                 } // -> withAnimation
@@ -135,17 +140,17 @@ struct Carousel: View {
         
     } // -> customDragGesture
     
-    func distance(_ idImg: Int) -> Double {
-        return (draggingImg - Double(idImg)).remainder(dividingBy: Double(storeCarImg.img.count))
+    func distance(_ idBook: Int) -> Double {
+        return (draggingImg - Double(idBook)).remainder(dividingBy: Double(viewModel.books.count))
     } // -> distance
 
-    func xOffset(_ idImg: Int) -> Double {
-        let angle = Double.pi * 1.5 / 8.5 * distance(idImg)
+    func xOffset(_ idBook: Int) -> Double {
+        let angle = Double.pi * 1.5 / 8.5 * distance(idBook)
         return sin(angle) * 200
     } // -> distance
     
-}
+} // -> CarouselView
 
 #Preview {
-    Carousel()
+    Carousel(viewModel: CarouselStoreModel())
 } // -> Preview
