@@ -24,7 +24,9 @@ struct Carousel: View {
                     
                     VStack {
                         
-                        AsyncImage(url: URL(string: book.book.photoUrl!)) { image in
+                        // MARK: PICTURE
+                        
+                        AsyncImage(url: URL(string: book.book.photoUrl!.replacingOccurrences(of: "http://", with: "https://"))) { image in
                             image
                                 .resizable()
                                 .scaledToFit()
@@ -38,6 +40,8 @@ struct Carousel: View {
                         } placeholder: {
                             ProgressView()
                         } // -> AsyncImage
+                        
+                        // MARK: PROGRESS
                         
                         VStack {
                             
@@ -74,6 +78,8 @@ struct Carousel: View {
     
                                     Spacer()
                                         .frame(height: 10)
+                                
+                                    // MARK: BUTTON CONTINUE
     
                                     Button {
     
@@ -104,9 +110,16 @@ struct Carousel: View {
                     
                 } // -> ZStack
                 .frame(width: 180, height: 350)
-                .scaleEffect(max(0.25, 1.0 - abs(distance(book.id)) * 0.25 ))
-                .offset(x: xOffset(book.id), y: 0)
-                .zIndex(1.0 - abs(distance(book.id)) * 0.1)
+                .scaleEffect(
+                    max(0.25, 1.0 - abs(distance(book.id)) * 0.25 )
+                ) // -> scaleEffect
+                .offset(
+                    x: xOffset(book.id),
+                    y: 0
+                ) // -> offset
+                .zIndex(
+                    1.0 - abs(distance(book.id)) * 0.1
+                ) // -> zIndex
                 .onTapGesture {
                     withAnimation {
                         draggingImg = Double(book.id)
@@ -116,15 +129,15 @@ struct Carousel: View {
             } // -> ForEach
             
         } // -> ZStack
-        .gesture(customDragGesture())
+        .gesture(customDragGesture(books: viewModel.books.count))
         
     } // -> body
     
-    private func customDragGesture() -> some Gesture {
+    private func customDragGesture(books: Int) -> some Gesture {
         
         DragGesture()
             .onChanged { value in
-                draggingImg = centerImg + value.translation.width / 100
+                draggingImg = books <= 1 ? centerImg : centerImg + value.translation.width / 100
             } // -> onChanged
             .onEnded { value in
                 

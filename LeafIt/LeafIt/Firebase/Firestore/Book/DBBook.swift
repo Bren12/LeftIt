@@ -11,9 +11,10 @@ struct DBBook: Codable {
     let userId: String
     var bookId: String?
     let bookGb: String
-    var listId: [String]
+    var listId: [String]?
     let title: String?
     let authors: [String]?
+    let description: String?
     let pages: Int?
     let readPages: Int?
     let progress: Int?
@@ -28,6 +29,7 @@ struct DBBook: Codable {
         case listId = "list_id"
         case title = "title"
         case authors = "authors"
+        case description = "description"
         case pages = "pages"
         case readPages = "read_pages"
         case progress = "progress"
@@ -40,9 +42,10 @@ struct DBBook: Codable {
         userId: String,
         bookId: String? = nil,
         bookGb: String,
-        listId: [String],
+        listId: [String]? = nil,
         title: String? = nil,
         authors: [String]? = nil,
+        description: String? = nil,
         pages: Int? = nil,
         readPages: Int? = nil,
         progress: Int? = nil,
@@ -56,6 +59,7 @@ struct DBBook: Codable {
         self.listId = listId
         self.title = title
         self.authors = authors
+        self.description = description
         self.pages = pages
         self.readPages = readPages
         self.progress = progress
@@ -69,9 +73,10 @@ struct DBBook: Codable {
         self.userId = try container.decode(String.self, forKey: .userId)
         self.bookId = try container.decodeIfPresent(String.self, forKey: .bookId)
         self.bookGb = try container.decode(String.self, forKey: .bookGb)
-        self.listId = try container.decode([String].self, forKey: .listId)
+        self.listId = try container.decodeIfPresent([String].self, forKey: .listId)
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
         self.authors = try container.decodeIfPresent([String].self, forKey: .authors)
+        self.description = try container.decodeIfPresent(String.self, forKey: .description)
         self.pages = try container.decodeIfPresent(Int.self, forKey: .pages)
         self.readPages = try container.decodeIfPresent(Int.self, forKey: .readPages)
         self.progress = try container.decodeIfPresent(Int.self, forKey: .progress)
@@ -85,9 +90,10 @@ struct DBBook: Codable {
         try container.encode(self.userId, forKey: .userId)
         try container.encodeIfPresent(self.bookId, forKey: .bookId)
         try container.encode(self.bookGb, forKey: .bookGb)
-        try container.encode(self.listId, forKey: .listId)
+        try container.encodeIfPresent(self.listId, forKey: .listId)
         try container.encodeIfPresent(self.title, forKey: .title)
         try container.encodeIfPresent(self.authors, forKey: .authors)
+        try container.encodeIfPresent(self.description, forKey: .description)
         try container.encodeIfPresent(self.pages, forKey: .pages)
         try container.encodeIfPresent(self.readPages, forKey: .readPages)
         try container.encodeIfPresent(self.progress, forKey: .progress)

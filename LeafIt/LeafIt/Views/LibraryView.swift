@@ -11,7 +11,9 @@ import SwiftUI
 final class LibraryModel: ObservableObject {
     
     @Published private(set) var user: DBUser? = nil
-    @Published private(set) var lists: [DBList]? = nil
+    @Published private(set) var lists: [DBList]? = []
+    @Published private(set) var books: [DBBook]? = nil
+    @Published private(set) var booksGB: [Book]? = nil
     
     func loadCurrentUser() async throws {
         let authDataResult = try AuthenticationManager.shared.getAuthenticatedUser()
@@ -38,6 +40,7 @@ struct LibraryView: View {
     @State private var search: String = ""
     @State private var startSearch: Bool = false
     @State private var inputText: String = ""
+    @State private var showBookView: Bool = false
     
     @StateObject private var viewModel = LibraryModel()
     
@@ -60,6 +63,8 @@ struct LibraryView: View {
                     
                     Spacer()
                         .frame(height: 62.5)
+                    
+                    // MARK: SEARCH BAR
                     
                     HStack {
                         
@@ -114,6 +119,8 @@ struct LibraryView: View {
                         
                     } // -> HStack
                     
+                    // MARK: SEARCH Function
+                    
                     if !startSearch {
                         
                         Spacer()
@@ -135,10 +142,14 @@ struct LibraryView: View {
                                 
                                 LazyVGrid(columns: rows, spacing: 20) {
                                     
+                                    // MARK: LISTS
+                                    
                                     ForEach(lists, id: \.listId) { list in
                                         
                                         NavigationLink {
-                                            EmptyView()
+                                            
+                                            BookListView(list: list.listId!)
+                                            
                                         } label: {
                                             
                                             ZStack {
@@ -172,9 +183,9 @@ struct LibraryView: View {
                     } else {
                         
                         
-                        
                         Spacer()
 //                            .frame(height: 120)
+                        
                         
                     } // -> if-else
                     
