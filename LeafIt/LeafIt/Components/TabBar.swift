@@ -9,24 +9,29 @@ import SwiftUI
 
 struct TabBar: View {
     
+    @State private var selectedTab = 0
+    
     var body: some View {
         
-        TabView {
+        TabView(selection: $selectedTab) {
             
-            HomeView()
+            HomeView(selectedTab: $selectedTab)
                 .tabItem {
                     Label("Home", systemImage: "house")
                 }
+                .tag(0)
             
             ExploreView()
                 .tabItem {
                     Label("Explore", systemImage: "magnifyingglass")
                 }
+                .tag(1)
             
             LibraryView()
                 .tabItem {
                     Label("Library", systemImage: "books.vertical")
                 }
+                .tag(2)
             
         } // -> TabView
         
