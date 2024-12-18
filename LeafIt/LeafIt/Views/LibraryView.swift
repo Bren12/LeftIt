@@ -41,6 +41,7 @@ struct LibraryView: View {
     @State private var startSearch: Bool = false
     @State private var inputText: String = ""
     @State private var showBookView: Bool = false
+    @State private var showSheet: Bool = false
     
     @StateObject private var viewModel = LibraryModel()
     
@@ -162,7 +163,7 @@ struct LibraryView: View {
                                                     
                                                     Text("\(list.name ?? "Loading...")")
                                                         .foregroundStyle(.primaryWhite)
-                                                        .font(.system(size: 15, weight: .regular))
+                                                        .font(.system(size: 20, weight: .bold))
                                                     
                                                 } // -> VStack
                                                 
@@ -184,7 +185,6 @@ struct LibraryView: View {
                         
                         
                         Spacer()
-//                            .frame(height: 120)
                         
                         
                     } // -> if-else
@@ -202,7 +202,7 @@ struct LibraryView: View {
                         Spacer()
                         
                         Button {
-                            viewModel.createList(name: inputText)
+                            showSheet.toggle()
                         } label: {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
@@ -212,13 +212,10 @@ struct LibraryView: View {
                                 .clipShape(Circle())
                                 .shadow(radius: 10)
                                 .padding(.trailing, 20)
+                                .padding(.bottom, 100)
                         } // -> Button
                         
                     } // -> HStack
-                    
-                    TextField("Ingresa un texto", text: $inputText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.bottom, 100)
                     
                 } // -> VStack
                 .zIndex(1)
@@ -237,6 +234,10 @@ struct LibraryView: View {
             try? await viewModel.loadCurrentUser()
             try? await viewModel.loadCurrentLists()
         } // task
+        .sheet(isPresented: $showSheet) {
+            ListSheetView(observedModel: viewModel, showSheet: $showSheet)
+                .presentationDetents([.fraction(0.3)])
+        }
         
     } // -> body
     
