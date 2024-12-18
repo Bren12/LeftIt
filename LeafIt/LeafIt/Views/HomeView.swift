@@ -79,6 +79,9 @@ final class GoalModel: ObservableObject {
     } // -> deleteGoal
     
     func registerReading() async throws {
+        Task {
+            try await getCurrBooks()
+        }
         guard let user, var streak = user.streak, let lastStreak = user.streakLastDay else { return }
         let currentDate = Date()
         if isYesterday(lastDate: lastStreak, currentDate: currentDate) {
@@ -93,9 +96,7 @@ final class GoalModel: ObservableObject {
             if !self.updatedStreak {
                 self.updatedStreak = true
                 try await loadCurrentUser()
-            }
-            try await getCurrBooks()
-        }
+            }        }
     } // -> deleteGoal
     
     private func isSameDay(lastDate: Date, currentDate: Date) -> Bool {
