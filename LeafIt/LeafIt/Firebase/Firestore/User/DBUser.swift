@@ -20,7 +20,7 @@ struct DBUser: Codable {
     let email: String?
     let photoUrl: String?
     let dateCreated: Date?
-    let streak: Int?
+    var streak: Int?
     let streakLastDay: Date?
     let readToday: Bool?
     let isPremium: Bool?

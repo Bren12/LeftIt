@@ -148,7 +148,7 @@ struct LibraryView: View {
                                         
                                         NavigationLink {
                                             
-                                            BookListView(list: list.listId!)
+                                            BookListView(listID: list.listId!, listName: list.name!)
                                             
                                         } label: {
                                             
@@ -207,8 +207,8 @@ struct LibraryView: View {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
                                 .frame(width: 60, height: 60)
-                                .foregroundColor(.white)
-                                .background(Color.blue)
+                                .foregroundColor(.accentColor)
+                                .background(.primaryWhite)
                                 .clipShape(Circle())
                                 .shadow(radius: 10)
                                 .padding(.trailing, 20)

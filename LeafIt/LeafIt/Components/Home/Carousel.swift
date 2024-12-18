@@ -10,9 +10,15 @@ import SwiftUI
 struct Carousel: View {
     
     @ObservedObject var viewModel: CarouselStoreModel
+    @ObservedObject var observedModel: GoalModel
     
+    @Binding var showSheet: Bool
+    @Binding var bookGB: String
+    
+    @State private var bookIndex: Int = 0
     @State private var centerImg = 0.0
     @State private var draggingImg = 0.0
+    @State private var showView = false
     
     var body: some View {
         
@@ -25,7 +31,6 @@ struct Carousel: View {
                     VStack {
                         
                         // MARK: PICTURE
-                        
                         AsyncImage(url: URL(string: book.book.photoUrl!.replacingOccurrences(of: "http://", with: "https://"))) { image in
                             image
                                 .resizable()
@@ -40,6 +45,12 @@ struct Carousel: View {
                         } placeholder: {
                             ProgressView()
                         } // -> AsyncImage
+//                        .onTapGesture {
+//                            if xOffset(book.id) == 0 {
+//                                bookIndex = book.id
+//                                showView.toggle()
+//                            }
+//                        }
                         
                         // MARK: PROGRESS
                         
@@ -82,9 +93,8 @@ struct Carousel: View {
                                     // MARK: BUTTON CONTINUE
     
                                     Button {
-    
-                                        // ACTION
-    
+                                        bookGB = book.book.bookGb
+                                        showSheet.toggle()
                                     } label: {
     
                                         ZStack {
@@ -126,6 +136,19 @@ struct Carousel: View {
                     } // -> withAnimation
                 } // -> onTapGesture
                 
+//                NavigationLink(destination: BookView(
+//                    book: Book(id: observedModel.books![bookIndex].bookGb, volumeInfo: VolumeInfo(
+//                        title: observedModel.books![bookIndex].title!,
+//                        authors: observedModel.books![bookIndex].authors,
+//                        description: observedModel.books![bookIndex].description,
+//                        pageCount: observedModel.books![bookIndex].pages,
+//                        imageLinks: ImageLinks(thumbnail: observedModel.books![bookIndex].photoUrl)
+//                    ))),
+//                               isActive: $showView
+//                ) {
+//                    EmptyView()
+//                } // -> NavigationLink
+                
             } // -> ForEach
             
         } // -> ZStack
@@ -165,5 +188,5 @@ struct Carousel: View {
 } // -> CarouselView
 
 #Preview {
-    Carousel(viewModel: CarouselStoreModel())
+    Carousel(viewModel: CarouselStoreModel(), observedModel: GoalModel(), showSheet: .constant(false), bookGB: .constant(""))
 } // -> Preview

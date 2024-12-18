@@ -15,6 +15,7 @@ final class GoalModel: ObservableObject {
     @Published private(set) var user: DBUser? = nil
     @Published private(set) var readGoal: DBReadingGoal? = nil
     @Published private(set) var books: [DBBook]? = nil
+    @Published private(set) var updatedStreak: Bool = false
     
     @Published var periodSelected: String = Period.month.rawValue
     @Published var readBook: String = ""
@@ -24,13 +25,24 @@ final class GoalModel: ObservableObject {
         let authDataResult = try AuthenticationManager.shared.getAuthenticatedUser()
         print(authDataResult)
         self.user = try await UserManager.shared.getUser(userID: authDataResult.uid)
+        guard let user, !updatedStreak else { return }
+        let currentDate = Date()
+        if !isYesterday(lastDate: user.streakLastDay!, currentDate: currentDate) && !isSameDay(lastDate: user.streakLastDay!, currentDate: currentDate) {
+            print(currentDate)
+            self.user?.streak = 0
+        } // -> if
     } // -> loadCurrentUser
     
     func getCurrGoal() async throws {
         guard let user else { return }
-        Task {
-            self.readGoal = try await ReadingGoalManager.shared.getCurrGoal(forUserId: user.userId)
-        }
+        self.readGoal = try await ReadingGoalManager.shared.getCurrGoal(forUserId: user.userId)
+        guard let readGoal else { return }
+        guard let period = readGoal.period else { return }
+        self.periodSelected = period.rawValue
+        guard let readBook = readGoal.bookRead else { return }
+        self.readBook = "\(readBook)"
+        guard let goalBook = readGoal.bookGoal else { return }
+        self.goalBook = "\(goalBook)"
     } // -> getCurrGoal
     
     func getCurrBooks() async throws {
@@ -66,6 +78,34 @@ final class GoalModel: ObservableObject {
         }
     } // -> deleteGoal
     
+    func registerReading() async throws {
+        guard let user, var streak = user.streak, let lastStreak = user.streakLastDay else { return }
+        let currentDate = Date()
+        if isYesterday(lastDate: lastStreak, currentDate: currentDate) {
+            streak += 1
+        } else if isSameDay(lastDate: lastStreak, currentDate: currentDate) {
+            return
+        } else {
+            streak = 1
+        }
+        Task {
+            try await UserManager.shared.registerReading(userID: user.userId, streak: streak)
+            if !self.updatedStreak {
+                self.updatedStreak = true
+                try await loadCurrentUser()
+            }
+            try await getCurrBooks()
+        }
+    } // -> deleteGoal
+    
+    private func isSameDay(lastDate: Date, currentDate: Date) -> Bool {
+        return Calendar.current.isDate(lastDate, inSameDayAs: currentDate)
+    } // -> isSameDay
+
+    private func isYesterday(lastDate: Date, currentDate: Date) -> Bool {
+        return Calendar.current.isDate(lastDate, inSameDayAs: Calendar.current.date(byAdding: .day, value: -1, to: currentDate)!)
+    } // -> isYesterday
+    
 } // -> LibraryModel
 
 // MARK: HomeView
@@ -77,6 +117,8 @@ struct HomeView: View {
     @ObservedObject private var viewRecentBook = RecentBooksModel()
     
     @State var showSheet = false
+    @State var showContinueSheet = false
+    @State var bookGB = ""
     
     @Binding var selectedTab: Int
     
@@ -183,7 +225,7 @@ struct HomeView: View {
                                 
                                 Spacer()
                                 
-                                Carousel(viewModel: CarouselStoreModel(bookList: viewModel.books ?? []))
+                                Carousel(viewModel: CarouselStoreModel(bookList: viewModel.books ?? []), observedModel: viewModel, showSheet: $showContinueSheet, bookGB: $bookGB)
                                 
                                 Spacer()
                                 
@@ -275,6 +317,10 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showSheet) { // MARK: SHEET
                 GoalSheetView(viewModel: viewModel, showSheet: $showSheet)
+                    .presentationDetents([.medium])
+            } // -> sheet
+            .sheet(isPresented: $showContinueSheet) { // MARK: SHEET
+                ContinueReadingSheetView(observedModel: viewModel, showSheet: $showContinueSheet, bookGB: $bookGB)
                     .presentationDetents([.medium])
             } // -> sheet
             

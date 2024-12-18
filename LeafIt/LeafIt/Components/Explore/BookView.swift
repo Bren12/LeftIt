@@ -22,77 +22,128 @@ struct BookView: View {
     
     var body: some View {
         
-        ScrollView {
+        ZStack {
             
-            VStack(spacing: 10) {
-                
-                AsyncImage(url: URL(string: thumbnail.replacingOccurrences(of: "http://", with: "https://"))) { image in
-                    image.resizable()
-                } placeholder: {
-                    ProgressView()
-                } // AsyncImage
-                .frame(width: 175)
-                .shadow(radius: 5)
-                .padding()
-
-                
-                Text(title)
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Divider()
-                
-                HStack{
-                    Text(authors.count > 1 ? "Authors:" : "Author:")
-                        .fontWeight(.bold)
-                    VStack(alignment: .leading) {
-                        ForEach(authors, id: \.self) {author in
-                            Text(author)
-                        } // -> ForEach
-                    } // -> Vstack
-                } // -> HStack
-                
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 5) {
-                    
-                    Text("Description:")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 5)
-                    
-                    Text(description)
-                        .lineLimit(expanded ? nil : 5)
-                    
-                    Button(action: {
-                        expanded.toggle()
-                    }, label: {
-                        Text(expanded ? "...read less" : "...read more")
-                    }) // -> Button
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    
-                } // VStack
-                .padding()
-                
-                Divider()
-                
-                HStack {
-                    Text("\(pageCount) pages")
-                } // -> HStack
-                
-                Divider()
-                
-                Button("Add to list") {
-                    showSheet.toggle()
-                } // -> Button
-                
-            } // -> VStack
+            Color.primaryWhite
             
-        } // -> ScrollView
-        .font(.title3)
+            ScrollView {
+                
+                VStack {
+                    
+                    Spacer()
+                        .frame(height: 125)
+                    
+                    AsyncImage(url: URL(string: thumbnail.replacingOccurrences(of: "http://", with: "https://"))) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: 10)
+                            ) // -> clipShape
+                    } placeholder: {
+                        ProgressView()
+                    } // AsyncImage
+                    .frame(width: 175)
+                    .shadow(radius: 5)
+                    
+                    Divider()
+                    
+                    Text(title)
+                        .foregroundStyle(.primaryBlack)
+                        .font(.system(size: 30, weight: .bold))
+                        .multilineTextAlignment(.center)
+                    
+                    Divider()
+                    
+                    HStack{
+                        VStack {
+                            Text(authors.count > 1 ? "Authors:" : "Author:")
+                                .foregroundStyle(.primaryBlack)
+                                .font(.system(size: 20, weight: .bold))
+                            Spacer()
+                        } // -> VStack
+                        VStack(alignment: .leading) {
+                            ForEach(authors, id: \.self) {author in
+                                Text(author)
+                                    .foregroundStyle(.primaryBlack)
+                                    .font(.system(size: 20, weight: .regular))
+                            } // -> ForEach
+                        } // -> Vstack
+                        Spacer()
+                    } // -> HStack
+                    
+                    Divider()
+                    
+                    VStack(spacing: 3) {
+                        
+                        HStack {
+                            Text("Description:")
+                                .foregroundStyle(.primaryBlack)
+                                .font(.system(size: 20, weight: .bold))
+                            Spacer()
+                        } // -> HStack
+                        
+                        Text(description)
+                            .foregroundStyle(.primaryBlack)
+                            .font(.system(size: 18, weight: .regular))
+                            .lineLimit(expanded ? nil : 5)
+                        
+                        if description.count > 200 {
+                            HStack {
+                                Spacer()
+                                Button(action: {
+                                    expanded.toggle()
+                                }, label: {
+                                    Text(expanded ? "...read less" : "...read more")
+                                }) // -> Button
+                            } // -> HStack
+                        } // -> if
+                        
+                    } // VStack
+                    
+                    Divider()
+                    
+                    HStack {
+                        Text("Pages:")
+                            .foregroundStyle(.primaryBlack)
+                            .font(.system(size: 20, weight: .bold))
+                        + Text(" \(pageCount)")
+                            .foregroundStyle(.primaryBlack)
+                            .font(.system(size: 20, weight: .regular))
+                        Spacer()
+                    } // -> HStack
+                    
+                    Divider()
+                    
+                    Spacer()
+                        .frame(height: 20)
+                    
+                    Button {
+                        showSheet.toggle()
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundStyle(.accent)
+                                .frame(height: 40)
+                            Text("Add Book")
+                                .foregroundStyle(.primaryWhite)
+                                .font(.system(size: 15, weight: .semibold))
+                        } // -> ZStack
+                    }// -> Button
+                    
+                } // -> VStack
+                .frame(width: 350)
+                
+                Spacer()
+                    .frame(height: 100)
+                
+            } // -> ScrollView
+            
+        } // -> ZSStack
+        .ignoresSafeArea()
         .sheet(isPresented: $showSheet) {
             BookSheetView(showSheet: $showSheet, book: book)
-                .presentationDetents([.medium,.large])
+                .presentationDetents([.large])
         }
         
     } // -> body

@@ -35,7 +35,7 @@ final class BookModel: ObservableObject {
         guard let book else {
             print("A new book needs to be created")
             return
-        }
+        } // -> book
         print("book already exists")
         guard let readPages = book.readPages else { return }
         self.readPages = "\(readPages)"
@@ -45,18 +45,17 @@ final class BookModel: ObservableObject {
         self.isCompleted = completed
         guard let listsIDs = book.listId else { return }
         self.isOnList = listsIDs
-//        self.isCompleted = completed
     } // -> loadCurrentUser
     
     func listSelected(listID: String) -> Bool {
         return self.isOnList.contains(listID) == true
-    } // listSelected
+    } // -> listSelected
     
     func toggleListSelection(listID: String) {
         if listSelected(listID: listID) {
             if let index = isOnList.firstIndex(of: listID) {
                 isOnList.remove(at: index)
-            }
+            } // -> index
         } else {
             isOnList.append(listID)
         } // -> if-else
@@ -68,22 +67,11 @@ final class BookModel: ObservableObject {
         guard let book, let bookID = book.bookId else {
             try await BookManager.shared.createNewBook(user: user.userId, bookGB: bookGB, list: isOnList, pages: pagesInt, readPages: readInt, completed: isCompleted)
             try await loadCurrentBook(bookGB: bookGB.id)
-            print("Book seen as created")
-            resetValues()
             return
         } // -> book
         try await BookManager.shared.updateBook(forBookId: bookID, list: isOnList, pages: pagesInt, readPages: readInt, isCompleted: isCompleted)
         try await loadCurrentBook(bookGB: bookGB.id)
-        print("Book seen as existed")
-        resetValues()
     }
-    
-    func resetValues() {
-        self.pages = ""
-        self.readPages = ""
-        self.isOnList = []
-        self.isCompleted = false
-    } // -> resetValues
     
 } // -> LibraryModel
 
