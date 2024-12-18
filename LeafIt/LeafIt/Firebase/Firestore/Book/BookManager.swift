@@ -173,16 +173,20 @@ final class BookManager {
     
     
     
-    // MARK: Update Book Read Pages
+    // MARK: Update Continue Reading
     
-    func updateBookReadPages(forBookId: String, readPages: Int) async throws {
-        guard let book = try await getBook(bookID: forBookId), let pages = book.pages else { return }
+    func updateReadingBook(forBookId: String, pages: Int, readPages: Int) async throws {
+        guard let book = try await getBook(bookID: forBookId) else { return }
+        guard readPages <= pages else { return }
+        let progress = (readPages*100)/(pages)
         let data: [String: Any] = [
+            DBBook.CodingKeys.pages.rawValue: pages,
             DBBook.CodingKeys.readPages.rawValue: readPages,
-            DBBook.CodingKeys.progress.rawValue: (readPages*100)/(pages),
+            DBBook.CodingKeys.progress.rawValue: progress,
+            DBBook.CodingKeys.completed.rawValue: progress == 100,
         ] // -> data
         try await bookDocument(bookID: forBookId).updateData(data)
-    } // -> updateBookCompleted
+    } // -> updateReadingBook
     
 } // -> ListManager
 

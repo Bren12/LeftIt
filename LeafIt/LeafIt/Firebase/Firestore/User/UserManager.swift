@@ -43,11 +43,34 @@ final class UserManager {
         try await ListManager.shared.createDefaultList(user: user.userId)
     } // -> createNewUser
     
-    
-    
     func getUser(userID: String) async throws -> DBUser {
         try await userDocument(userID: userID).getDocument(as: DBUser.self)
     } // -> getUser
+    
+    func registerReading(userID: String, streak: Int) async throws {
+        let data: [String: Any] = [
+            DBUser.CodingKeys.streak.rawValue: streak,
+            DBUser.CodingKeys.streakLastDay.rawValue: Date(),
+        ] // -> data
+        try await userDocument(userID: userID).updateData(data)
+    } // -> registerReading
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
         
