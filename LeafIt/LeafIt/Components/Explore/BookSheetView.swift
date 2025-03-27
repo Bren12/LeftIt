@@ -92,6 +92,8 @@ struct BookSheetView: View {
         
         ZStack {
             
+            Color.primaryWhite
+            
             VStack {
                 
                 Spacer()
@@ -190,12 +192,21 @@ struct BookSheetView: View {
                         Spacer()
                             .frame(width: 10)
                         
-                        TextField("Ex. 420", text: $viewModel.pages)
-                            .foregroundStyle(.primaryBlack)
-                            .keyboardType(.numberPad)
-                            .onChange(of: viewModel.pages) { newValue in
-                                viewModel.pages = newValue.filter { $0.isNumber }
-                            } // -> onChange
+                        ZStack(alignment: .leading) {
+                            
+                            if viewModel.pages.isEmpty {
+                                Text("Ex. 420")
+                                    .foregroundStyle(.primaryGray)
+                            } // -> if
+                            
+                            TextField("", text: $viewModel.pages)
+                                .foregroundStyle(viewModel.pages.isEmpty ? .primaryGray : .primaryBlack)
+                                .keyboardType(.numberPad)
+                                .onChange(of: viewModel.pages) { newValue in
+                                    viewModel.pages = newValue.filter { $0.isNumber }
+                                } // -> onChange
+                            
+                        } // -> ZStack
                         
                     } // -> HStack
                     
@@ -232,12 +243,21 @@ struct BookSheetView: View {
                         Spacer()
                             .frame(width: 10)
                         
-                        TextField("Ex. 2", text: $viewModel.readPages)
-                            .foregroundStyle(.primaryBlack)
-                            .keyboardType(.numberPad)
-                            .onChange(of: viewModel.readPages) { newValue in
-                                viewModel.readPages = newValue.filter { $0.isNumber }
-                            } // -> onChange
+                        ZStack(alignment: .leading) {
+                            
+                            if viewModel.readPages.isEmpty {
+                                Text("Ex. 2")
+                                    .foregroundStyle(.primaryGray)
+                            } // -> if
+                            
+                            TextField("", text: $viewModel.readPages)
+                                .foregroundStyle(viewModel.readPages.isEmpty ? .primaryGray : .primaryBlack)
+                                .keyboardType(.numberPad)
+                                .onChange(of: viewModel.readPages) { newValue in
+                                    viewModel.readPages = newValue.filter { $0.isNumber }
+                                } // -> onChange
+                            
+                        } // -> ZStack
                         
                     } // -> HStack
                     
@@ -315,7 +335,6 @@ struct BookSheetView: View {
                         
                         if let pagesInt = Int(viewModel.pages), let pagesReadInt = Int(viewModel.readPages), pagesReadInt <= pagesInt {
                             Task {
-                                print("Pages Read Int: \(pagesReadInt)")
                                 try await viewModel.applyChanges(bookGB: book)
                             } // --> Task
                             showSheet.toggle()

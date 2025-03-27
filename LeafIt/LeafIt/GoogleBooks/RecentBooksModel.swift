@@ -14,8 +14,6 @@ class RecentBooksModel: ObservableObject {
     
     init() {
         
-        print("searching")
-        
         let currDate = Date()
         let calendar = Calendar.current
         let currYear = calendar.component(.year, from: currDate)
@@ -34,8 +32,6 @@ class RecentBooksModel: ObservableObject {
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             
-            print("searching 2")
-            
             guard let data = data else {
                 DispatchQueue.main.async {
                     self.isLoading = false
@@ -52,7 +48,6 @@ class RecentBooksModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.books = searchResponse.items ?? []
                     self.isLoading = false
-                    print("search succesful")
                 } // -> DispatchQueue
                 
             } catch {

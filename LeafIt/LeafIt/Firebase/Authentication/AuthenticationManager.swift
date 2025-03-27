@@ -31,28 +31,6 @@ final class AuthenticationManager {
     
     
     
-    func getProviders() throws -> [AuthProviderOption] {
-        guard let providerData = Auth.auth().currentUser?.providerData else {
-            throw URLError(.badServerResponse)
-        } // -> guard
-        
-        var providers: [AuthProviderOption] = []
-        
-        for provider in providerData {
-            if let option = AuthProviderOption(rawValue: provider.providerID) {
-                providers.append(option)
-            } else {
-                assertionFailure("Provider option not found: \(provider.providerID)")
-            } // -> if-else
-        } // -> for
-        
-        print(providers)
-        
-        return providers
-    } // -> getProviders
-    
-    
-    
     @discardableResult
     func createUser(email: String, password: String) async throws -> AuthDataResultModel {
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)

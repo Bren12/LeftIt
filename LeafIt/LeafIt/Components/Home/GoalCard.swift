@@ -19,7 +19,7 @@ struct GoalCard: View {
             
             RoundedRectangle(cornerRadius: 10)
                 .frame(width: 350, height: 80)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondaryWhite)
                 .shadow(
                     radius: 4,
                     y: 4
@@ -31,6 +31,8 @@ struct GoalCard: View {
                     .frame(width: 20)
                 
                 BookIcon(viewModel: viewModel)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Streak: \(viewModel.user?.streak ?? 0) days")
                 
                 VStack(alignment: .leading) {
                                         
@@ -46,9 +48,10 @@ struct GoalCard: View {
                         Text("Let’s set a new goal!")
                             .foregroundStyle(.primaryGray)
                             .font(.system(size: 10, weight: .regular))
-                    }
+                    } // -> if-else
                     
                 } // -> VStack
+                .accessibilityElement(children: .combine)
                 
                 Spacer()
                 
@@ -70,6 +73,8 @@ struct GoalCard: View {
                     } // -> ZStack
                     
                 } // -> Button
+                .accessibilityLabel(viewModel.readBook != nil ? "Set new reading goal" : "Edit reading goal")
+                .accessibilityHint("Tap for \(viewModel.readBook != nil ? "add" : "edit") the reading goal")
                 
                 Spacer()
                     .frame(width: 20)

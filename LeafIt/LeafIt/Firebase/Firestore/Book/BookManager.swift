@@ -49,7 +49,6 @@ final class BookManager {
     // MARK: Create Book
     
     func createNewBook(user: String, bookGB: Book, list: [String], pages: Int, readPages: Int, completed: Bool) async throws {
-        print(bookGB)
         guard let volume = bookGB.volumeInfo else { return }
         var book = DBBook(
             userId: user,
@@ -133,17 +132,6 @@ final class BookManager {
         } // -> books
         return books.first
     } // -> getBookUser
-    
-    
-    
-    // MARK: Update Book List
-
-    func updateBookList(forBookId: String, list: [String]) async throws {
-        let data: [String: Any] = [
-            DBBook.CodingKeys.listId.rawValue: list,
-        ] // -> data
-        try await bookDocument(bookID: forBookId).updateData(data)
-    } // -> addBookList
     
     
     

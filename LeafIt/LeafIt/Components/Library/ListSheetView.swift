@@ -19,6 +19,8 @@ struct ListSheetView: View {
         
         ZStack {
             
+            Color.primaryWhite
+            
             VStack {
                 
                 Spacer()
@@ -58,8 +60,17 @@ struct ListSheetView: View {
                         Spacer()
                             .frame(width: 10)
                         
-                        TextField("Ex. Now Reading", text: $listName)
-                            .foregroundStyle(.primaryBlack)
+                        ZStack(alignment: .leading) {
+                            
+                            if listName.isEmpty {
+                                Text("Ex. Now Reading")
+                                    .foregroundStyle(.primaryGray)
+                            } // -> if
+                            
+                            TextField("", text: $listName)
+                                .foregroundStyle(listName.isEmpty ? .primaryGray : .primaryBlack)
+                            
+                        } // -> ZStack
                         
                     } // -> HStack
                     

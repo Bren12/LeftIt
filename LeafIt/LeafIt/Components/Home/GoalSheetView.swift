@@ -17,10 +17,14 @@ struct GoalSheetView: View {
         
         ZStack {
             
+            Color.primaryWhite
+            
             VStack {
                 
                 Spacer()
                     .frame(height: 30)
+                
+                // MARK: TITLE
                 
                 Text("📚 Goal Progress 📚")
                     .foregroundStyle(.primaryBlack)
@@ -30,6 +34,8 @@ struct GoalSheetView: View {
                 
                 Spacer()
                     .frame(height: 20)
+                
+                // MARK: TIME LAPSE
                 
                 HStack {
                     
@@ -83,9 +89,11 @@ struct GoalSheetView: View {
                 Spacer()
                     .frame(height: 20)
                 
+                // MARK: BOOKS READ
+                
                 HStack {
                     
-                    Text("Books read this year")
+                    Text("Books read this \(viewModel.periodSelected.lowercased())")
                         .foregroundStyle(.primaryBlack)
                         .font(.system(size: 15, weight: .bold))
                     
@@ -104,12 +112,21 @@ struct GoalSheetView: View {
                         Spacer()
                             .frame(width: 10)
                         
-                        TextField("Ex. 2", text: $viewModel.readBook)
-                            .foregroundStyle(.primaryBlack)
-                            .keyboardType(.numberPad)
-                            .onChange(of: viewModel.readBook) { newValue in
-                                viewModel.readBook = newValue.filter { $0.isNumber }
-                            } // -> onChange
+                        ZStack(alignment: .leading) {
+                            
+                            if viewModel.readBook.isEmpty {
+                                Text("Ex. 2")
+                                    .foregroundStyle(.primaryGray)
+                            } // -> if
+                            
+                            TextField("", text: $viewModel.readBook)
+                                .foregroundStyle(.primaryBlack)
+                                .keyboardType(.numberPad)
+                                .onChange(of: viewModel.readBook) { newValue in
+                                    viewModel.readBook = newValue.filter { $0.isNumber }
+                                } // -> onChange
+                            
+                        } // -> ZStack
                         
                     } // -> HStack
                     
@@ -123,9 +140,11 @@ struct GoalSheetView: View {
                 Spacer()
                     .frame(height: 20)
                 
+                // MARK: BOOKS GOAL
+                
                 HStack {
                     
-                    Text("Year goal of books to read")
+                    Text("\(viewModel.periodSelected) goal of books to read")
                         .foregroundStyle(.primaryBlack)
                         .font(.system(size: 15, weight: .bold))
                     
@@ -144,12 +163,21 @@ struct GoalSheetView: View {
                         Spacer()
                             .frame(width: 10)
                         
-                        TextField("Ex. 9", text: $viewModel.goalBook)
-                            .foregroundStyle(.primaryBlack)
-                            .keyboardType(.numberPad)
-                            .onChange(of: viewModel.goalBook) { newValue in
-                                viewModel.goalBook = newValue.filter { $0.isNumber }
-                            } // -> onChange
+                        ZStack(alignment: .leading) {
+                            
+                            if viewModel.goalBook.isEmpty {
+                                Text("Ex. 9")
+                                    .foregroundStyle(.primaryGray)
+                            } // -> if
+                            
+                            TextField("", text: $viewModel.goalBook)
+                                .foregroundStyle(.primaryBlack)
+                                .keyboardType(.numberPad)
+                                .onChange(of: viewModel.goalBook) { newValue in
+                                    viewModel.goalBook = newValue.filter { $0.isNumber }
+                                } // -> onChange
+                            
+                        } // -> ZStack
                         
                     } // -> HStack
                     
@@ -194,10 +222,8 @@ struct GoalSheetView: View {
                         if let readInt = Int(viewModel.readBook), let goalInt = Int(viewModel.goalBook), let periodEnum = Period(rawValue: viewModel.periodSelected), goalInt != 0, readInt <= goalInt {
                             
                             if viewModel.readGoal == nil {
-                                print("CREATE")
                                 viewModel.createGoal()
                             } else {
-                                print("UPDATE")
                                 viewModel.updateGoal()
                             } // -> if-else
                             

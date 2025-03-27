@@ -24,8 +24,6 @@ class BookSearchModel: ObservableObject {
         
         guard !searchQuery.isEmpty else { return }
         
-        print("searching")
-        
         var url = URL(string: bookURL)!
         let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "q", value: searchQuery),
@@ -38,8 +36,6 @@ class BookSearchModel: ObservableObject {
         isLoading = true
         
         URLSession.shared.dataTask(with: url) { data, response, error in
-            
-            print("searching 2")
             
             guard let data = data else {
                 DispatchQueue.main.async {
@@ -62,7 +58,6 @@ class BookSearchModel: ObservableObject {
                     } // -> if-else
                     self.showBookDisplayView.toggle()
                     self.isLoading = false
-                    print("search succesful")
                 } // -> DispatchQueue
                 
             } catch {

@@ -19,7 +19,7 @@ struct RootView: View {
         ZStack {
             
             CoverView()
-            .opacity(isTransitioning ? 0 : 1)
+                .opacity(isTransitioning ? 0 : 1)
             
             if showHomeView {
                 TabBar()

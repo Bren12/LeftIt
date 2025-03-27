@@ -104,7 +104,7 @@ struct Carousel: View {
                                                 .frame(width: 75, height: 30)
     
                                             Text("Continue")
-                                                .foregroundStyle(.white)
+                                                .foregroundStyle(.secondaryWhite)
                                                 .font(.system(size: 10, weight: .semibold))
     
                                         } // -> ZStack

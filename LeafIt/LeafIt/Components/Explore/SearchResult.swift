@@ -80,11 +80,9 @@ struct SearchResult: View {
         } // -> ScrollView
         .scrollIndicators(.hidden)
         .onChange(of: contentOffset) {
-            print(contentOffset)
             if contentOffset < auxContentOffset {
                 auxContentOffset -= 1300 // 2100
                 viewModel.loadMoreBooks()
-                print(contentOffset)
             }
         }
         

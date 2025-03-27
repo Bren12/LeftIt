@@ -33,7 +33,7 @@ struct ExploreView: View {
                         ZStack {
                             
                             RoundedRectangle(cornerRadius: 10)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.secondaryWhite)
                                 .frame(height: 32.5)
                             
                             HStack {
