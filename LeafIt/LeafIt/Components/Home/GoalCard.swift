@@ -9,85 +9,68 @@ import SwiftUI
 
 struct GoalCard: View {
     
-    @ObservedObject var viewModel: GoalModel
-    
     @Binding var showSheet: Bool
+    @State var setGoal: Bool = false // HardCode
     
     var body: some View {
-        
-        ZStack {
             
-            RoundedRectangle(cornerRadius: 10)
-                .frame(width: 350, height: 80)
-                .foregroundStyle(.secondaryWhite)
-                .shadow(
-                    radius: 4,
-                    y: 4
-                )
+        HStack {
             
-            HStack {
-                
-                Spacer()
-                    .frame(width: 20)
-                
-                BookIcon(viewModel: viewModel)
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Streak: \(viewModel.user?.streak ?? 0) days")
-                
-                VStack(alignment: .leading) {
-                                        
-                    Text("\( (viewModel.readGoal?.period?.rawValue ?? "") + (viewModel.readGoal?.period?.rawValue != nil ? " " : "") )Goal Progress")
-                        .foregroundStyle(.primaryBlack)
-                        .font(.system(size: 15, weight: .medium))
-                    
-                    if let readGoal = viewModel.readGoal, let goal = readGoal.bookGoal, let read = readGoal.bookRead {
-                        Text("\(read) / \(goal) books")
-                            .foregroundStyle(.primaryGray)
-                            .font(.system(size: 10, weight: .regular))
-                    } else {
-                        Text("Let’s set a new goal!")
-                            .foregroundStyle(.primaryGray)
-                            .font(.system(size: 10, weight: .regular))
-                    } // -> if-else
-                    
-                } // -> VStack
-                .accessibilityElement(children: .combine)
-                
-                Spacer()
-                
-                Button {
-                    
-                    showSheet.toggle()
-                    
-                } label: {
-                    
-                    ZStack {
-                        
-                        RoundedRectangle(cornerRadius: 5)
-                            .foregroundStyle(.secondaryPurple)
-                            .frame(width: 55, height: 30)
-                        
-                        Image(systemName: "square.and.pencil")
-                            .foregroundStyle(.accent)
-                        
-                    } // -> ZStack
-                    
-                } // -> Button
-                .accessibilityLabel(viewModel.readBook != nil ? "Set new reading goal" : "Edit reading goal")
-                .accessibilityHint("Tap for \(viewModel.readBook != nil ? "add" : "edit") the reading goal")
-                
-                Spacer()
-                    .frame(width: 20)
-                
-            } // -> HStack
-            .frame(width: 350)
+            Spacer()
+                .frame(width: 10)
             
-        } // -> ZStack
+            BookIcon()
+            
+            VStack(alignment: .leading) {
+                
+                Text("Goal Progress")
+                    .foregroundStyle(.primaryBlack)
+                    .font(.system(size: 15, weight: .medium))
+                
+                // MARK: CONDITION - IS GOAL SET?
+                if setGoal {
+                    Text("\(1) / \(10) books")
+                        .foregroundStyle(.primaryGray)
+                        .font(.system(size: 10, weight: .regular))
+                } else {
+                    Text("Let’s set a new goal!")
+                        .foregroundStyle(.primaryGray)
+                        .font(.system(size: 10, weight: .regular))
+                } // -> if-else
+                
+            } // -> VStack
+            
+            Spacer()
+            
+            // MARK: SET/EDIT GOAL
+            Button {
+                showSheet.toggle()
+            } label: {
+                Image(systemName: "square.and.pencil")
+                    .foregroundStyle(.accent)
+                    .padding(.horizontal, 17.5)
+                    .padding(.vertical, 7.5)
+                    .background(.secondaryPurple)
+                    .cornerRadius(5)
+            } // -> Button
+            
+            Spacer()
+                .frame(width: 10)
+            
+        } // -> HStack
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(.white)
+        .cornerRadius(10)
+        .shadow(
+            radius: 4,
+            y: 4
+        ) // -> HStack.shadow
         
     } // -> body
     
 } // -> GoalCard
 
 #Preview {
-    GoalCard(viewModel: GoalModel(), showSheet: .constant(false))
+    GoalCard(showSheet: .constant(false))
 } // -> Preview

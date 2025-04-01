@@ -9,13 +9,13 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @StateObject private var viewModel = GoalModel()
-    
     @ObservedObject private var viewRecentBook = RecentBooksModel()
     
     @State var showSheet = false
     @State var showContinueSheet = false
     @State var bookGB = ""
+    
+    @State var bookSaved = false // HARDCORE
     
     @Binding var selectedTab: Int
     
@@ -31,48 +31,40 @@ struct HomeView: View {
                     
                     VStack {
                         
-                        // MARK: Header
-                        
                         Spacer()
                             .frame(height: 62.5)
                         
-                        VStack {
+                        // MARK: DEFAULT GREETING
+                        HStack {
                             
-                            HStack {
-                                
-                                Text("It's great to see you,")
-                                    .foregroundStyle(.primaryGray)
-                                    .font(.system(size: 14))
-                                
-                                Spacer()
-                                
-                            } // -> HStack
-                            .frame(width: 350)
+                            Text("It's great to see you,")
+                                .foregroundStyle(.primaryGray)
+                                .font(.system(size: 14))
                             
-                            HStack {
-                                
-                                Text("\(viewModel.user?.nickname ?? readerUser)")
-                                    .foregroundStyle(.primaryBlack)
-                                    .font(.system(size: 20, weight: .semibold))
-                                
-                                Spacer()
-                                
-                            } // -> HStack
-                            .frame(width: 350)
+                            Spacer()
                             
-                        } // -> VStack
-                        .accessibilityElement(children: .combine)
-                        .accessibilityAddTraits(.isHeader)
+                        } // -> HStack
                         
-                        GoalCard(viewModel: viewModel, showSheet: $showSheet)
+                        // MARK: GREETING USER
+                        HStack {
+                            
+                            Text("\(readerUser)")
+                                .foregroundStyle(.primaryBlack)
+                                .font(.system(size: 20, weight: .semibold))
+                            
+                            Spacer()
+                            
+                        } // -> HStack
+                        
+                        // MARK: GOALCARD
+                        GoalCard(showSheet: $showSheet)
                         
                         Spacer()
                             .frame(height: 30)
                         
-                        // MARK: Reading
-                        
-                        if viewModel.books == nil {
-                            
+                        // MARK: READING
+                        if !bookSaved {
+
                             VStack {
                                 
                                 Image(.magicBook)
@@ -91,7 +83,6 @@ struct HomeView: View {
                                     .frame(height: 30)
                                 
                             } // -> VStack
-                            .accessibilityElement(children: .combine)
                             
                             Button {
                                 selectedTab =  1
@@ -110,8 +101,6 @@ struct HomeView: View {
                                 } // -> ZStack
                                 
                             } // -> Button
-                            .accessibilityLabel("Add book")
-                            .accessibilityHint("Tap to add a new book that you are currently reading")
                             
                             Spacer()
                                 .frame(height: 10)
@@ -134,7 +123,7 @@ struct HomeView: View {
                                 
                                 Spacer()
                                 
-                                Carousel(viewModel: CarouselStoreModel(bookList: viewModel.books ?? []), observedModel: viewModel, showSheet: $showContinueSheet, bookGB: $bookGB)
+//                                Carousel(viewModel: CarouselStoreModel(bookList: viewModel.books ?? []), observedModel: viewModel, showSheet: $showContinueSheet, bookGB: $bookGB)
                                 
                                 Spacer()
                                 
@@ -152,7 +141,6 @@ struct HomeView: View {
                             Text("Recently published")
                                 .foregroundStyle(.primaryBlack)
                                 .font(.system(size: 20, weight: .semibold))
-                                .accessibilityAddTraits(.isHeader)
                             
                             Spacer()
                             
@@ -166,7 +154,7 @@ struct HomeView: View {
                                 Spacer()
                                 
                                 ForEach(viewRecentBook.books) { book in
-        
+
                                         VStack {
         
                                             NavigationLink {
@@ -189,8 +177,8 @@ struct HomeView: View {
                                                 }
                                                 .frame(width: 100, height: 150)
         
-                                            } // -> Button
-        
+                                            } // -> NavigationLink
+
                                             Text("\(book.volumeInfo?.title ?? "")")
                                                 .foregroundStyle(.primaryBlack)
                                                 .font(.system(size: 15, weight: .medium))
@@ -214,23 +202,19 @@ struct HomeView: View {
                             .frame(height: 100)
                         
                     } // -> VStack
+                    .padding(.horizontal)
                     
                 } // -> ScrollView
                 .scrollIndicators(.hidden)
                 
             } // -> ZStack
             .ignoresSafeArea()
-            .task { // MARK: TASK
-                try? await viewModel.loadCurrentUser()
-                try? await viewModel.getCurrGoal()
-                try? await viewModel.getCurrBooks()
-            }
             .sheet(isPresented: $showSheet) { // MARK: SHEET
-                GoalSheetView(viewModel: viewModel, showSheet: $showSheet)
+                GoalSheetView(showSheet: $showSheet)
                     .presentationDetents([.medium])
             } // -> sheet
             .sheet(isPresented: $showContinueSheet) { // MARK: SHEET
-                ContinueReadingSheetView(observedModel: viewModel, showSheet: $showContinueSheet, bookGB: $bookGB)
+                ContinueReadingSheetView(showSheet: $showContinueSheet, bookGB: $bookGB)
                     .presentationDetents([.medium])
             } // -> sheet
             

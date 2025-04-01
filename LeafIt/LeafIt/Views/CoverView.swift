@@ -13,7 +13,11 @@ struct CoverView: View {
         
         ZStack {
             
-            LinearGradient(gradient: Gradient(colors: [.accent, .primaryPink]), startPoint: .top, endPoint: .bottom)
+            LinearGradient(
+                gradient: Gradient(colors: [.accent, .primaryPink]),
+                startPoint: .top,
+                endPoint: .bottom
+            ) // -> LinearGradient
             
             VStack {
                 
@@ -25,7 +29,7 @@ struct CoverView: View {
                 
                 Spacer()
                 
-                Text("Leaf It")
+                Text(appName)
                     .foregroundStyle(.primaryWhite)
                     .font(.system(size: 20, weight: .bold))
                     .padding(.bottom, 50)

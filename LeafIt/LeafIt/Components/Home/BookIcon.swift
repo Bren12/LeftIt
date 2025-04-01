@@ -9,8 +9,6 @@ import SwiftUI
 
 struct BookIcon: View {
     
-    @ObservedObject var viewModel: GoalModel
-    
     var body: some View {
         
         ZStack {
@@ -27,18 +25,18 @@ struct BookIcon: View {
                         .scaledToFit()
                     
                     VStack {
-                        
-                        HStack(spacing: 5) {
                             
+                        HStack(spacing: 5) {
+                        
                             Image(.fire)
                                 .resizable()
                                 .scaledToFit()
                             
                             Divider()
                             
-                            Text("\(viewModel.user?.streak ?? 0)")
+                            Text("\(1)")
                                 .foregroundStyle(.primaryBlack)
-                            
+
                         } // -> HStack
                         .frame(height: 17)
                         
@@ -59,5 +57,5 @@ struct BookIcon: View {
 } // -> BookIcon
 
 #Preview {
-    BookIcon(viewModel: GoalModel())
+    BookIcon()
 } // -> Preview

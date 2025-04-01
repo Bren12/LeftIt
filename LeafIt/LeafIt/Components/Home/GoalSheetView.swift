@@ -9,9 +9,9 @@ import SwiftUI
 
 struct GoalSheetView: View {
     
-    @ObservedObject var viewModel: GoalModel
-    
     @Binding var showSheet: Bool
+    
+    @State private var periodSelected: Period = .month
     
     var body: some View {
         
@@ -52,12 +52,12 @@ struct GoalSheetView: View {
                     ForEach(Period.allCases, id: \.self) { period in
                         
                         Button {
-                            viewModel.periodSelected = period.rawValue
+                            periodSelected = period
                         } label: {
                             
                             ZStack {
                                 
-                                if viewModel.periodSelected == period.rawValue {
+                                if periodSelected == period {
                                     RoundedRectangle(cornerRadius: 10)
                                         .foregroundStyle(.accent)
                                         .frame(width: 100, height: 27)
@@ -68,7 +68,7 @@ struct GoalSheetView: View {
                                 }
                                 
                                 Text("\(period.rawValue)")
-                                    .foregroundStyle(viewModel.periodSelected == period.rawValue ? .primaryWhite : .accent)
+                                    .foregroundStyle(periodSelected == period ? .primaryWhite : .accent)
                                     .font(.system(size: 12, weight: .regular))
                                 
                             } // -> ZStack
@@ -93,7 +93,7 @@ struct GoalSheetView: View {
                 
                 HStack {
                     
-                    Text("Books read this \(viewModel.periodSelected.lowercased())")
+                    Text("Books read this \(periodSelected.rawValue.lowercased())")
                         .foregroundStyle(.primaryBlack)
                         .font(.system(size: 15, weight: .bold))
                     
@@ -112,21 +112,21 @@ struct GoalSheetView: View {
                         Spacer()
                             .frame(width: 10)
                         
-                        ZStack(alignment: .leading) {
-                            
-                            if viewModel.readBook.isEmpty {
-                                Text("Ex. 2")
-                                    .foregroundStyle(.primaryGray)
-                            } // -> if
-                            
-                            TextField("", text: $viewModel.readBook)
-                                .foregroundStyle(.primaryBlack)
-                                .keyboardType(.numberPad)
-                                .onChange(of: viewModel.readBook) { newValue in
-                                    viewModel.readBook = newValue.filter { $0.isNumber }
-                                } // -> onChange
-                            
-                        } // -> ZStack
+//                        ZStack(alignment: .leading) {
+//                            
+//                            if viewModel.readBook.isEmpty {
+//                                Text("Ex. 2")
+//                                    .foregroundStyle(.primaryGray)
+//                            } // -> if
+//                            
+//                            TextField("", text: $viewModel.readBook)
+//                                .foregroundStyle(.primaryBlack)
+//                                .keyboardType(.numberPad)
+//                                .onChange(of: viewModel.readBook) { newValue in
+//                                    viewModel.readBook = newValue.filter { $0.isNumber }
+//                                } // -> onChange
+//                            
+//                        } // -> ZStack
                         
                     } // -> HStack
                     
@@ -144,7 +144,7 @@ struct GoalSheetView: View {
                 
                 HStack {
                     
-                    Text("\(viewModel.periodSelected) goal of books to read")
+                    Text("\(periodSelected.rawValue) goal of books to read")
                         .foregroundStyle(.primaryBlack)
                         .font(.system(size: 15, weight: .bold))
                     
@@ -163,21 +163,21 @@ struct GoalSheetView: View {
                         Spacer()
                             .frame(width: 10)
                         
-                        ZStack(alignment: .leading) {
-                            
-                            if viewModel.goalBook.isEmpty {
-                                Text("Ex. 9")
-                                    .foregroundStyle(.primaryGray)
-                            } // -> if
-                            
-                            TextField("", text: $viewModel.goalBook)
-                                .foregroundStyle(.primaryBlack)
-                                .keyboardType(.numberPad)
-                                .onChange(of: viewModel.goalBook) { newValue in
-                                    viewModel.goalBook = newValue.filter { $0.isNumber }
-                                } // -> onChange
-                            
-                        } // -> ZStack
+//                        ZStack(alignment: .leading) {
+//                            
+//                            if viewModel.goalBook.isEmpty {
+//                                Text("Ex. 9")
+//                                    .foregroundStyle(.primaryGray)
+//                            } // -> if
+//                            
+//                            TextField("", text: $viewModel.goalBook)
+//                                .foregroundStyle(.primaryBlack)
+//                                .keyboardType(.numberPad)
+//                                .onChange(of: viewModel.goalBook) { newValue in
+//                                    viewModel.goalBook = newValue.filter { $0.isNumber }
+//                                } // -> onChange
+//                            
+//                        } // -> ZStack
                         
                     } // -> HStack
                     
@@ -193,59 +193,59 @@ struct GoalSheetView: View {
                 
                 HStack {
                     
-                    if viewModel.readGoal != nil {
-
-                        Button {
-                            viewModel.deleteGoal()
-                            showSheet.toggle()
-                            resetValues()
-                        } label: {
-                            
-                            ZStack {
-                                
-                                RoundedRectangle(cornerRadius: 10)
-                                    .foregroundStyle(.primaryRed)
-                                    .frame(height: 40)
-                                
-                                Text("Delete Goal")
-                                    .foregroundStyle(.primaryWhite)
-                                    .font(.system(size: 15, weight: .semibold))
-                                
-                            } // -> ZStack
-                            
-                        } // -> Button
-                        
-                    } // -> if
+//                    if viewModel.readGoal != nil {
+//
+//                        Button {
+//                            viewModel.deleteGoal()
+//                            showSheet.toggle()
+//                            resetValues()
+//                        } label: {
+//                            
+//                            ZStack {
+//                                
+//                                RoundedRectangle(cornerRadius: 10)
+//                                    .foregroundStyle(.primaryRed)
+//                                    .frame(height: 40)
+//                                
+//                                Text("Delete Goal")
+//                                    .foregroundStyle(.primaryWhite)
+//                                    .font(.system(size: 15, weight: .semibold))
+//                                
+//                            } // -> ZStack
+//                            
+//                        } // -> Button
+//                        
+//                    } // -> if
                 
-                    Button {
-                        
-                        if let readInt = Int(viewModel.readBook), let goalInt = Int(viewModel.goalBook), let periodEnum = Period(rawValue: viewModel.periodSelected), goalInt != 0, readInt <= goalInt {
-                            
-                            if viewModel.readGoal == nil {
-                                viewModel.createGoal()
-                            } else {
-                                viewModel.updateGoal()
-                            } // -> if-else
-                            
-                            showSheet.toggle()
-                            resetValues()
-                        } // -> if
-                        
-                    } label: {
-                        
-                        ZStack {
-                            
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundStyle(.accent)
-                                .frame(height: 40)
-                            
-                            Text(viewModel.readGoal == nil ? "Set Goal" : "Update Goal")
-                                .foregroundStyle(.primaryWhite)
-                                .font(.system(size: 15, weight: .semibold))
-                            
-                        } // -> ZStack
-                        
-                    } // -> Button
+//                    Button {
+//                        
+//                        if let readInt = Int(viewModel.readBook), let goalInt = Int(viewModel.goalBook), let periodEnum = Period(rawValue: viewModel.periodSelected), goalInt != 0, readInt <= goalInt {
+//                            
+//                            if viewModel.readGoal == nil {
+//                                viewModel.createGoal()
+//                            } else {
+//                                viewModel.updateGoal()
+//                            } // -> if-else
+//                            
+//                            showSheet.toggle()
+//                            resetValues()
+//                        } // -> if
+//                        
+//                    } label: {
+//                        
+//                        ZStack {
+//                            
+//                            RoundedRectangle(cornerRadius: 10)
+//                                .foregroundStyle(.accent)
+//                                .frame(height: 40)
+//                            
+//                            Text(viewModel.readGoal == nil ? "Set Goal" : "Update Goal")
+//                                .foregroundStyle(.primaryWhite)
+//                                .font(.system(size: 15, weight: .semibold))
+//                            
+//                        } // -> ZStack
+//                        
+//                    } // -> Button
                     
                 } // -> HStack
                 
@@ -258,14 +258,14 @@ struct GoalSheetView: View {
         
     } // -> body
     
-    func resetValues() {
-        viewModel.goalBook = ""
-        viewModel.readBook = ""
-        viewModel.periodSelected = Period.month.rawValue
-    }
+//    func resetValues() {
+//        viewModel.goalBook = ""
+//        viewModel.readBook = ""
+//        viewModel.periodSelected = Period.month.rawValue
+//    }
     
 } // -> GoalSheetView
 
 #Preview {
-    GoalSheetView(viewModel: GoalModel(), showSheet: .constant(true))
+    GoalSheetView(showSheet: .constant(true))
 } // -> Preview

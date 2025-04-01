@@ -1,13 +1,13 @@
+////
+////  ImgCarousel.swift
+////  LeafIt
+////
+////  Created by Brenda Elena Saucedo Gonzalez on 09/12/24.
+////
 //
-//  ImgCarousel.swift
-//  LeafIt
+//import Foundation
 //
-//  Created by Brenda Elena Saucedo Gonzalez on 09/12/24.
-//
-
-import Foundation
-
-struct CarouselStore: Identifiable {
-    var id: Int
-    var book: DBBook
-}
+//struct CarouselStore: Identifiable {
+//    var id: Int
+//    var book: DBBook
+//}
