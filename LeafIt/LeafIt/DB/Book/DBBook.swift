@@ -1,12 +1,44 @@
-////
-////  DBList.swift
-////  LeafIt
-////
-////  Created by Brenda Elena Saucedo Gonzalez on 15/12/24.
-////
 //
-//import Foundation
+//  DBBook.swift
+//  LeafIt
 //
+//  Created by Brenda Elena Saucedo Gonzalez on 02/04/25.
+//
+
+import Foundation
+import SwiftData
+
+@Model
+class DBBook: Identifiable {
+    var bookId: UUID = UUID()
+    var listId: DBList
+    var bookOL: Int
+    var pages: Int
+    var readPages: Int
+    var completed: Bool
+    
+    init(
+        bookId: UUID,
+        listId: DBList,
+        bookOL: Int,
+        pages: Int,
+        readPages: Int,
+        completed: Bool
+    ) {
+        self.bookId = bookId
+        self.listId = listId
+        self.bookOL = bookOL
+        self.pages = pages
+        self.readPages = readPages
+        self.completed = completed
+    } // -> init
+} // -> DBBook
+
+
+
+
+
+
 //struct DBBook: Codable {
 //    let userId: String
 //    var bookId: String?
@@ -21,7 +53,7 @@
 //    let completed: Bool?
 //    let dateCreated: Date?
 //    let photoUrl: String?
-//    
+//
 //    enum CodingKeys: String, CodingKey {
 //        case userId = "user_id"
 //        case bookId = "book_id"
@@ -37,7 +69,7 @@
 //        case dateCreated = "date_created"
 //        case photoUrl = "photo_url"
 //    } // -> enum
-//    
+//
 //    init(
 //        userId: String,
 //        bookId: String? = nil,
@@ -67,7 +99,7 @@
 //        self.dateCreated = dateCreated
 //        self.photoUrl = photoUrl
 //    } // -> init
-//    
+//
 //    init(from decoder: Decoder) throws {
 //        let container = try decoder.container(keyedBy: CodingKeys.self)
 //        self.userId = try container.decode(String.self, forKey: .userId)
@@ -84,7 +116,7 @@
 //        self.dateCreated = try container.decodeIfPresent(Date.self, forKey: .dateCreated)
 //        self.photoUrl = try container.decodeIfPresent(String.self, forKey: .photoUrl)
 //    } // -> Decoder
-//    
+//
 //    func encode(to encoder: Encoder) throws {
 //        var container = encoder.container(keyedBy: CodingKeys.self)
 //        try container.encode(self.userId, forKey: .userId)
@@ -101,5 +133,5 @@
 //        try container.encodeIfPresent(self.dateCreated, forKey: .dateCreated)
 //        try container.encodeIfPresent(self.photoUrl, forKey: .photoUrl)
 //    } // -> Encoder
-//    
+//
 //} // -> DBList

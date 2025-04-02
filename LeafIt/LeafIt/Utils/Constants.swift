@@ -7,12 +7,27 @@
 
 import Foundation
 
-let apiKey = "&key=AIzaSyAs0IlJ32uhJbjJq6yBH1iqBBIPiUoWBOc"
-
 let bookURL = "https://www.googleapis.com/books/v1/volumes?"
 
 let bookCodeURL = "https://www.googleapis.com/books/v1/volumes/"
 
+
+
+
+
+
 let appName = "Leaf It"
 
 let readerUser = "Leaf Reader"
+
+
+
+
+
+let baseBookURL = "https://openlibrary.org"
+
+let bookSearchURL = "/search.json?"
+
+let bookURL2 = "/works/"
+
+let limitBookPerPage = 18

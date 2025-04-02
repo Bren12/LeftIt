@@ -65,8 +65,5 @@
 //    } // -> progressPercentage
 //    
 //} // -> DBReadingGoal
-//
-//enum Period: String, Decodable, Encodable, CaseIterable {
-//    case month = "Month"
-//    case year = "Year"
-//} // -> Period
+
+

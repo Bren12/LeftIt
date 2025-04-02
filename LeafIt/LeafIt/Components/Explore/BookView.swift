@@ -142,8 +142,8 @@ struct BookView: View {
         } // -> ZSStack
         .ignoresSafeArea()
         .sheet(isPresented: $showSheet) {
-            BookSheetView(showSheet: $showSheet, book: book)
-                .presentationDetents([.large])
+//            BookSheetView(showSheet: $showSheet, book: book)
+//                .presentationDetents([.large])
         }
         
     } // -> body
